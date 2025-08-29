@@ -1,0 +1,133 @@
+### Car Marketplace API Tests
+### Use with VS Code REST Client extension or import to Postman
+
+@baseUrl = http://localhost:3001
+@authToken = your-jwt-token-here
+
+### 1. User Registration
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "password123",
+  "role": "CUSTOMER",
+  "phone": "+1234567890"
+}
+
+### 2. User Login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+
+### 3. Get User Profile (Protected)
+GET {{baseUrl}}/users/profile
+Authorization: Bearer {{authToken}}
+
+### 4. Post a Car (Owner only)
+POST {{baseUrl}}/cars
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "2023 Toyota Camry",
+  "brand": "Toyota",
+  "category": "Sedan",
+  "availableForRental": true,
+  "rentalPricePerDay": 75.00,
+  "availableForSale": true,
+  "salePrice": 25000.00,
+  "year": 2023,
+  "color": "White",
+  "description": "Excellent condition, low mileage",
+  "mileage": 15000,
+  "fuelType": "Gasoline",
+  "transmission": "Automatic",
+  "seats": 5,
+  "location": "New York, NY",
+  "features": {
+    "bluetooth": true,
+    "backupCamera": true,
+    "leatherSeats": false,
+    "sunroof": true
+  },
+  "images": [
+    "https://example.com/car1.jpg",
+    "https://example.com/car2.jpg"
+  ]
+}
+
+### 5. Get All Cars (with filters)
+GET {{baseUrl}}/cars?category=Sedan&availableForRental=true&minPrice=50&maxPrice=100
+
+### 6. Get Car Details
+GET {{baseUrl}}/cars/car-id-here
+
+### 7. Create Rental Booking
+POST {{baseUrl}}/bookings
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "carId": "car-id-here",
+  "startDate": "2024-01-15",
+  "endDate": "2024-01-20",
+  "totalPrice": 375.00,
+  "notes": "Business trip booking"
+}
+
+### 8. Get User Bookings
+GET {{baseUrl}}/bookings
+Authorization: Bearer {{authToken}}
+
+### 9. Create Sale Transaction
+POST {{baseUrl}}/sales
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "carId": "car-id-here",
+  "buyerId": "buyer-user-id",
+  "sellerId": "seller-user-id",
+  "price": 25000.00,
+  "notes": "Cash purchase"
+}
+
+### 10. Process Payment
+POST {{baseUrl}}/payments
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "transactionType": "RENTAL",
+  "transactionId": "booking-id-here",
+  "amount": 375.00,
+  "method": "CARD",
+  "notes": "Credit card payment"
+}
+
+### 11. Update Booking Status
+PUT {{baseUrl}}/bookings/booking-id-here
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "status": "CONFIRMED"
+}
+
+### 12. Search Cars by Brand
+GET {{baseUrl}}/cars?brand=Toyota&availableForSale=true
+
+### 13. Get Cars by Owner
+GET {{baseUrl}}/cars?ownerId=owner-user-id
+
+### 14. Get Sales History
+GET {{baseUrl}}/sales?sellerId=seller-user-id
+
+### 15. Get Payment History
+GET {{baseUrl}}/payments?transactionType=RENTAL&status=COMPLETED 
