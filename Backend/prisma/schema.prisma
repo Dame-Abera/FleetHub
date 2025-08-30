@@ -1,0 +1,156 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CUSTOMER
+  OWNER
+  ADMIN
+}
+
+enum CarCategory {
+  SUV
+  Sedan
+  Hatchback
+  Coupe
+  Convertible
+  Wagon
+  Pickup
+  Van
+  Truck
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+enum TransactionType {
+  RENTAL
+  SALE
+}
+
+enum PaymentMethod {
+  CARD
+  PAYPAL
+  CASH
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         UserRole @default(CUSTOMER)
+  phone        String?
+  avatar       String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relationships
+  cars         Car[]
+  bookings     Booking[]
+  purchases    SaleTransaction[] @relation("Buyer")
+  sales        SaleTransaction[] @relation("Seller")
+
+  @@map("users")
+}
+
+model Car {
+  id                  String       @id @default(uuid())
+  name                String
+  brand               String
+  category            CarCategory
+  features            Json?
+  availableForRental  Boolean      @default(false)
+  rentalPricePerDay   Decimal?     @db.Decimal(10, 2)
+  availableForSale    Boolean      @default(false)
+  salePrice           Decimal?     @db.Decimal(10, 2)
+  images              String[]
+  year                Int?
+  color               String?
+  description         String?
+  mileage             Int?
+  fuelType            String?
+  transmission        String?
+  seats               Int?
+  location            String?
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  // Relationships
+  postedById          String
+  postedBy            User         @relation(fields: [postedById], references: [id])
+  bookings            Booking[]
+  sales               SaleTransaction[]
+
+  @@map("cars")
+}
+
+model Booking {
+  id          String        @id @default(uuid())
+  carId       String
+  userId      String
+  startDate   DateTime      @db.Date
+  endDate     DateTime      @db.Date
+  totalPrice  Decimal       @db.Decimal(10, 2)
+  status      BookingStatus @default(PENDING)
+  notes       String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Relationships
+  car         Car           @relation(fields: [carId], references: [id])
+  user        User          @relation(fields: [userId], references: [id])
+
+  @@map("bookings")
+}
+
+model SaleTransaction {
+  id        String   @id @default(uuid())
+  carId     String
+  buyerId   String
+  sellerId  String
+  price     Decimal  @db.Decimal(10, 2)
+  date      DateTime @default(now())
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  car       Car      @relation(fields: [carId], references: [id])
+  buyer     User     @relation("Buyer", fields: [buyerId], references: [id])
+  seller    User     @relation("Seller", fields: [sellerId], references: [id])
+
+  @@map("sale_transactions")
+}
+
+model Payment {
+  id              String        @id @default(uuid())
+  transactionType TransactionType
+  transactionId   String
+  amount          Decimal       @db.Decimal(10, 2)
+  method          PaymentMethod
+  status          PaymentStatus @default(PENDING)
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@map("payments")
+} 
