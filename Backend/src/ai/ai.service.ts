@@ -4,16 +4,25 @@ import { HumanMessage, SystemMessage } from 'langchain/schema';
 
 @Injectable()
 export class AiService {
-  private chatModel: ChatOpenAI;
+  private chatModel?: ChatOpenAI;
 
   constructor() {
-    this.chatModel = new ChatOpenAI({
-      openAIApiKey: process.env.OPENAI_API_KEY,
-      temperature: 0.7,
-    });
+    const key = process.env.OPENAI_API_KEY;
+    if (key && key.trim().length > 0) {
+      this.chatModel = new ChatOpenAI({
+        openAIApiKey: key,
+        temperature: 0.7,
+      });
+    } else {
+      // No API key provided: run in fallback mode without blocking app startup
+      console.warn('AI disabled: OPENAI_API_KEY not set. Using local fallbacks.');
+    }
   }
 
   async generateCarDescription(make: string, model: string, year: number, features: string[]): Promise<string> {
+    if (!this.chatModel) {
+      return `Beautiful ${year} ${make} ${model} with excellent features including ${features.join(', ')}. Perfect for your transportation needs.`;
+    }
     const systemMessage = new SystemMessage(
       'You are a professional car salesperson. Generate an engaging, detailed description for a car listing that highlights key features and appeals to potential buyers or renters.'
     );
@@ -48,6 +57,9 @@ export class AiService {
   }
 
   async generateChatResponse(userMessage: string, context?: any): Promise<string> {
+    if (!this.chatModel) {
+      return "I'm sorry, I'm having trouble processing your request right now. Please try again later or contact our support team.";
+    }
     const systemMessage = new SystemMessage(
       'You are a helpful car marketplace assistant. Help users with questions about cars, rentals, purchases, and general automotive advice. Be friendly and informative.'
     );
@@ -70,6 +82,9 @@ export class AiService {
     location?: string;
     features?: string[];
   }): Promise<string> {
+    if (!this.chatModel) {
+      return "I'm having trouble generating recommendations right now. Please try browsing our available cars or contact support.";
+    }
     const { budget, category, purpose, location, features } = userPreferences;
     
     const systemMessage = new SystemMessage(
@@ -97,6 +112,9 @@ export class AiService {
   }
 
   async analyzeMarketTrends(carData: any[]): Promise<string> {
+    if (!this.chatModel) {
+      return "Market analysis is currently unavailable. Our team is working to restore this feature.";
+    }
     const systemMessage = new SystemMessage(
       'You are a market analyst specializing in automotive trends. Analyze car marketplace data and provide insights.'
     );
@@ -129,6 +147,13 @@ export class AiService {
     description: string;
     keywords: string[];
   }> {
+    if (!this.chatModel) {
+      return {
+        title: `${car.year} ${car.brand} ${car.name} - ${car.availableForRental ? 'Rental' : 'Sale'}`,
+        description: car.description || `${car.year} ${car.brand} ${car.name} available for ${car.availableForRental ? 'rental' : 'sale'} in ${car.location}`,
+        keywords: [car.brand, car.category, car.location, 'car', car.availableForRental ? 'rental' : 'sale'].filter(Boolean)
+      };
+    }
     const systemMessage = new SystemMessage(
       'You are an SEO expert. Generate optimized titles, descriptions, and keywords for car listings to improve search visibility.'
     );
