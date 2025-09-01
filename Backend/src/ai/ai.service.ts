@@ -63,6 +63,104 @@ export class AiService {
     }
   }
 
+  async recommendCars(userPreferences: {
+    budget?: number;
+    category?: string;
+    purpose?: 'rental' | 'purchase';
+    location?: string;
+    features?: string[];
+  }): Promise<string> {
+    const { budget, category, purpose, location, features } = userPreferences;
+    
+    const systemMessage = new SystemMessage(
+      'You are an expert car recommendation engine. Analyze user preferences and provide personalized car recommendations with detailed explanations.'
+    );
+    
+    const humanMessage = new HumanMessage(
+      `Recommend cars for a user with these preferences:
+      - Budget: ${budget ? `$${budget}` : 'No specific budget'}
+      - Category: ${category || 'Any category'}
+      - Purpose: ${purpose || 'Not specified'}
+      - Location: ${location || 'Not specified'}
+      - Desired Features: ${features?.join(', ') || 'None specified'}
+      
+      Provide 3-5 specific recommendations with reasons why each car fits their needs.`
+    );
+
+    try {
+      const response = await this.chatModel.call([systemMessage, humanMessage]);
+      return response.content as string;
+    } catch (error) {
+      console.error('AI recommendation failed:', error);
+      return "I'm having trouble generating recommendations right now. Please try browsing our available cars or contact support.";
+    }
+  }
+
+  async analyzeMarketTrends(carData: any[]): Promise<string> {
+    const systemMessage = new SystemMessage(
+      'You are a market analyst specializing in automotive trends. Analyze car marketplace data and provide insights.'
+    );
+    
+    const dataString = JSON.stringify(carData.slice(0, 10)); // Limit data size
+    
+    const humanMessage = new HumanMessage(
+      `Analyze this car marketplace data and provide market insights:
+      ${dataString}
+      
+      Focus on:
+      1. Popular car categories
+      2. Price trends
+      3. Rental vs sale preferences
+      4. Geographic patterns
+      5. Feature demands`
+    );
+
+    try {
+      const response = await this.chatModel.call([systemMessage, humanMessage]);
+      return response.content as string;
+    } catch (error) {
+      console.error('Market analysis failed:', error);
+      return "Market analysis is currently unavailable. Our team is working to restore this feature.";
+    }
+  }
+
+  async generateSEOContent(car: any): Promise<{
+    title: string;
+    description: string;
+    keywords: string[];
+  }> {
+    const systemMessage = new SystemMessage(
+      'You are an SEO expert. Generate optimized titles, descriptions, and keywords for car listings to improve search visibility.'
+    );
+    
+    const humanMessage = new HumanMessage(
+      `Generate SEO content for this car:
+      ${car.year} ${car.brand} ${car.name}
+      Category: ${car.category}
+      Location: ${car.location}
+      Available for: ${car.availableForRental ? 'Rental' : ''} ${car.availableForSale ? 'Sale' : ''}
+      
+      Return as JSON with title, description, and keywords array.`
+    );
+
+    try {
+      const response = await this.chatModel.call([systemMessage, humanMessage]);
+      const content = JSON.parse(response.content as string);
+      return {
+        title: content.title || `${car.year} ${car.brand} ${car.name}`,
+        description: content.description || car.description,
+        keywords: content.keywords || [car.brand, car.category, car.location].filter(Boolean)
+      };
+    } catch (error) {
+      console.error('SEO generation failed:', error);
+      return {
+        title: `${car.year} ${car.brand} ${car.name} - ${car.availableForRental ? 'Rental' : 'Sale'}`,
+        description: car.description || `${car.year} ${car.brand} ${car.name} available for ${car.availableForRental ? 'rental' : 'sale'} in ${car.location}`,
+        keywords: [car.brand, car.category, car.location, 'car', car.availableForRental ? 'rental' : 'sale'].filter(Boolean)
+      };
+    }
+  }
+
   private getBasePriceByMake(make: string): number {
     const basePrices: { [key: string]: number } = {
       'toyota': 25000,
