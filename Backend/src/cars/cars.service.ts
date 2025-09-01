@@ -4,7 +4,7 @@ import { AiService } from '../ai/ai.service';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
 import { SearchCarsDto } from './dto/search-cars.dto';
-import { User } from '../users/entities/user.entity';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class CarsService {

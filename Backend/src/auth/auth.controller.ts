@@ -7,7 +7,7 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { GetUser } from './decorators/get-user.decorator';
-import { User } from '../users/entities/user.entity';
+import { User } from '@prisma/client';
 
 @ApiTags('auth')
 @Controller('auth')

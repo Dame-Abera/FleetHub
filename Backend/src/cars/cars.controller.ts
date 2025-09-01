@@ -6,7 +6,7 @@ import { UpdateCarDto } from './dto/update-car.dto';
 import { SearchCarsDto } from './dto/search-cars.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../auth/decorators/get-user.decorator';
-import { User } from '../users/entities/user.entity';
+import { User } from '@prisma/client';
 
 @ApiTags('cars')
 @Controller('cars')
