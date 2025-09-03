@@ -12,8 +12,25 @@ datasource db {
 
 enum UserRole {
   CUSTOMER
-  OWNER
+  COMPANY_USER
   ADMIN
+}
+
+enum CompanyStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum CarStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+  SOLD
+  RENTED
+  MAINTENANCE
 }
 
 enum CarCategory {
@@ -63,13 +80,53 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
+  // Company User specific fields
+  companyId    String?
+  company      Company? @relation(fields: [companyId], references: [id])
+  
+  // Admin approval tracking
+  approvedBy   String?
+  approvedAt   DateTime?
+  approvedByUser User? @relation("AdminApprovals", fields: [approvedBy], references: [id])
+
   // Relationships
   cars         Car[]
   bookings     Booking[]
   purchases    SaleTransaction[] @relation("Buyer")
   sales        SaleTransaction[] @relation("Seller")
+  approvedUsers User[] @relation("AdminApprovals")
+  reviews      Review[] @relation("Reviewer")
+  receivedReviews Review[] @relation("Reviewee")
+  approvedCars Car[] @relation("CarApprovals")
+  approvedCompanies Company[] @relation("CompanyApprovals")
 
   @@map("users")
+}
+
+model Company {
+  id          String        @id @default(uuid())
+  name        String
+  email       String        @unique
+  phone       String?
+  address     String?
+  website     String?
+  description String?
+  logo        String?
+  status      CompanyStatus @default(PENDING)
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Admin approval tracking
+  approvedBy  String?
+  approvedAt  DateTime?
+  approvedByUser User? @relation("CompanyApprovals", fields: [approvedBy], references: [id])
+
+  // Relationships
+  users       User[]
+  cars        Car[]
+
+  @@map("companies")
 }
 
 model Car {
@@ -91,14 +148,24 @@ model Car {
   transmission        String?
   seats               Int?
   location            String?
+  status              CarStatus    @default(DRAFT)
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
+
+  // Admin approval tracking
+  approvedBy          String?
+  approvedAt          DateTime?
+  approvedByUser      User? @relation("CarApprovals", fields: [approvedBy], references: [id])
+  rejectionReason     String?
 
   // Relationships
   postedById          String
   postedBy            User         @relation(fields: [postedById], references: [id])
+  companyId           String?
+  company             Company?     @relation(fields: [companyId], references: [id])
   bookings            Booking[]
   sales               SaleTransaction[]
+  reviews             Review[]
 
   @@map("cars")
 }
@@ -152,5 +219,45 @@ model Payment {
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
+  // Payment processing details
+  paymentIntentId String?       // Stripe/PayPal payment intent ID
+  refundId        String?       // Refund transaction ID
+  processedAt     DateTime?
+  failedReason    String?
+
   @@map("payments")
+}
+
+model Review {
+  id          String   @id @default(uuid())
+  carId       String
+  reviewerId  String
+  revieweeId  String
+  rating      Int      // 1-5 stars
+  title       String?
+  comment     String?
+  isVerified  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  car         Car      @relation(fields: [carId], references: [id])
+  reviewer    User     @relation("Reviewer", fields: [reviewerId], references: [id])
+  reviewee    User     @relation("Reviewee", fields: [revieweeId], references: [id])
+
+  @@unique([carId, reviewerId]) // One review per user per car
+  @@map("reviews")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  type      String   // 'APPROVAL', 'BOOKING', 'PAYMENT', 'REVIEW', etc.
+  isRead    Boolean  @default(false)
+  data      Json?    // Additional data for the notification
+  createdAt DateTime @default(now())
+
+  @@map("notifications")
 } 
