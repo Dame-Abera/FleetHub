@@ -98,34 +98,104 @@ const HomePage: React.FC = () => {
 
   return (
     <Box>
+      <style>
+        {`
+          @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+          }
+          @keyframes fadeInUp {
+            from {
+              opacity: 0;
+              transform: translateY(30px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+          .fade-in-up {
+            animation: fadeInUp 0.8s ease-out;
+          }
+        `}
+      </style>
       {/* Hero Section */}
       <Box
         sx={{
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          position: 'relative',
           color: 'white',
           py: { xs: 8, md: 12 },
-          position: 'relative',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          minHeight: { xs: '70vh', md: '80vh' },
+          display: 'flex',
+          alignItems: 'center'
         }}
       >
-    <Container maxWidth="lg">
+        {/* Video Background */}
+        <Box
+          component="video"
+          autoPlay
+          muted
+          loop
+          playsInline
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            zIndex: -2
+          }}
+        >
+          <source src="/20250905-2136-14.1033037.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </Box>
+        
+        {/* Fallback Background for browsers that don't support video */}
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            zIndex: -3
+          }}
+        />
+        
+        {/* Overlay */}
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%)',
+            zIndex: -1
+          }}
+        />
+            <Container maxWidth="lg">
           <Grid container spacing={4} alignItems="center">
             <Grid item xs={12} md={6}>
-              <Typography 
-                variant={isMobile ? "h3" : "h2"} 
-                component="h1" 
-                gutterBottom
-                sx={{ fontWeight: 700, mb: 3 }}
-              >
-                Your Perfect Car Awaits
-        </Typography>
-              <Typography 
-                variant={isMobile ? "h6" : "h5"} 
-                paragraph
-                sx={{ mb: 4, opacity: 0.9 }}
-              >
-                Discover, rent, or buy from thousands of verified vehicles with AI-powered recommendations and the best market prices.
-        </Typography>
+              <Box className="fade-in-up">
+                <Typography 
+                  variant={isMobile ? "h3" : "h2"} 
+                  component="h1" 
+                  gutterBottom
+                  sx={{ fontWeight: 700, mb: 3 }}
+                >
+                  Your Perfect Car Awaits
+                </Typography>
+                <Typography 
+                  variant={isMobile ? "h6" : "h5"} 
+                  paragraph
+                  sx={{ mb: 4, opacity: 0.9 }}
+                >
+                  Discover, rent, or buy from thousands of verified vehicles with AI-powered recommendations and the best market prices.
+                </Typography>
               <Stack 
                 direction={{ xs: 'column', sm: 'row' }} 
                 spacing={2} 
@@ -208,6 +278,7 @@ const HomePage: React.FC = () => {
                   }} 
                 />
               </Stack>
+              </Box>
             </Grid>
             <Grid item xs={12} md={6}>
               <Box
@@ -215,17 +286,35 @@ const HomePage: React.FC = () => {
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'center',
-                  height: { xs: 300, md: 400 }
+                  height: { xs: 300, md: 400 },
+                  position: 'relative',
+                  zIndex: 1
                 }}
               >
-                <DirectionsCarIcon 
-                  sx={{ 
-                    fontSize: { xs: 200, md: 300 }, 
-                    opacity: 0.3,
+                <Box
+                  className="fade-in-up"
+                  sx={{
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    backdropFilter: 'blur(10px)',
+                    borderRadius: 4,
+                    p: 4,
+                    textAlign: 'center',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
                     animation: 'float 3s ease-in-out infinite'
-                  }} 
-                />
-        </Box>
+                  }}
+                >
+                  <DirectionsCarIcon 
+                    sx={{ 
+                      fontSize: { xs: 80, md: 120 }, 
+                      mb: 2,
+                      opacity: 0.9
+                    }} 
+                  />
+                  <Typography variant="h5" sx={{ fontWeight: 600, opacity: 0.9 }}>
+                    Your Journey Starts Here
+                  </Typography>
+                </Box>
+              </Box>
             </Grid>
           </Grid>
         </Container>
