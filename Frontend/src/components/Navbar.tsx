@@ -20,7 +20,7 @@ const Navbar: React.FC = () => {
         <DirectionsCarIcon sx={{ mr: 2 }} />
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
-            CarMarket Pro
+            FleetHub
           </Link>
         </Typography>
         
