@@ -288,30 +288,53 @@ const HomePage: React.FC = () => {
                   alignItems: 'center',
                   height: { xs: 300, md: 400 },
                   position: 'relative',
-                  zIndex: 1
+                  zIndex: 1,
+                  mt: { xs: 4, md: 0 }
                 }}
               >
                 <Box
                   className="fade-in-up"
                   sx={{
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    backdropFilter: 'blur(10px)',
-                    borderRadius: 4,
-                    p: 4,
+                    background: 'rgba(255, 255, 255, 0.15)',
+                    backdropFilter: 'blur(15px)',
+                    borderRadius: 6,
+                    p: { xs: 3, md: 5 },
                     textAlign: 'center',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    animation: 'float 3s ease-in-out infinite'
+                    border: '2px solid rgba(255, 255, 255, 0.3)',
+                    animation: 'float 3s ease-in-out infinite',
+                    maxWidth: { xs: '100%', md: '400px' },
+                    width: '100%',
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
                   }}
                 >
                   <DirectionsCarIcon 
                     sx={{ 
-                      fontSize: { xs: 80, md: 120 }, 
+                      fontSize: { xs: 60, md: 100 }, 
                       mb: 2,
-                      opacity: 0.9
+                      opacity: 0.95,
+                      color: 'white'
                     }} 
                   />
-                  <Typography variant="h5" sx={{ fontWeight: 600, opacity: 0.9 }}>
+                  <Typography 
+                    variant="h5" 
+                    sx={{ 
+                      fontWeight: 700, 
+                      opacity: 0.95,
+                      color: 'white',
+                      mb: 1
+                    }}
+                  >
                     Your Journey Starts Here
+                  </Typography>
+                  <Typography 
+                    variant="body1" 
+                    sx={{ 
+                      opacity: 0.8,
+                      color: 'white',
+                      fontSize: '0.9rem'
+                    }}
+                  >
+                    Join thousands of satisfied customers
                   </Typography>
                 </Box>
               </Box>
