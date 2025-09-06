@@ -172,11 +172,11 @@ const Navbar: React.FC = () => {
                     fontWeight: 600
                   }}
                 >
-                  {user.name?.charAt(0)?.toUpperCase() || 'U'}
+                  {user.name?.charAt(0)?.toUpperCase() || user.firstName?.charAt(0)?.toUpperCase() || 'U'}
                 </Avatar>
                 <Box>
                   <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                    {user.name}
+                    {user.name || `${user.firstName} ${user.lastName}`}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {user.email}
@@ -419,7 +419,7 @@ const Navbar: React.FC = () => {
                         }
                       }}
                     >
-                      {user.name?.charAt(0)?.toUpperCase() || 'U'}
+                      {user.name?.charAt(0)?.toUpperCase() || user.firstName?.charAt(0)?.toUpperCase() || 'U'}
                     </Avatar>
                   </IconButton>
 
@@ -454,7 +454,7 @@ const Navbar: React.FC = () => {
                     {/* User Info Header */}
                     <Box sx={{ px: 2, py: 1.5, borderBottom: '1px solid rgba(0, 0, 0, 0.08)' }}>
                       <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                        {user.name}
+                        {user.name || `${user.firstName} ${user.lastName}`}
                       </Typography>
                       <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                         {user.email}

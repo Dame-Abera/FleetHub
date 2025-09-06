@@ -6,13 +6,15 @@ interface User {
   email: string;
   firstName: string;
   lastName: string;
+  name?: string;
+  avatar?: string;
   role: string;
 }
 
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
-  register: (userData: any) => Promise<void>;
+  register: (email: string, password: string, firstName: string, lastName: string) => Promise<void>;
   logout: () => void;
   loading: boolean;
 }
