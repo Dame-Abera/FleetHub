@@ -394,49 +394,7 @@ const Navbar: React.FC = () => {
           {/* Spacer */}
           <Box sx={{ flexGrow: 1 }} />
 
-<<<<<<< HEAD
-=======
-          {/* Rental/Sale Toggle - Desktop Only */}
-          {!isMobile && (
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={isRental}
-                  onChange={(e) => setIsRental(e.target.checked)}
-                  sx={{
-                    '& .MuiSwitch-switchBase.Mui-checked': {
-                      color: '#ff9800',
-                      '& + .MuiSwitch-track': {
-                        backgroundColor: '#ff9800',
-                      },
-                    },
-                    '& .MuiSwitch-track': {
-                      backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                    },
-                  }}
-                />
-              }
-              label={
-                <Chip 
-                  label={isRental ? "Rental" : "Sale"}
-                  size="small"
-                  sx={{ 
-                    color: 'white',
-                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                    fontWeight: 500
-                  }} 
-                />
-              }
-              sx={{ 
-                mr: 3, 
-                '& .MuiFormControlLabel-label': {
-                  margin: 0
-                }
-              }}
-            />
-          )}
 
->>>>>>> e22d8735b1451ef710ad4f21bbf7e8321afc9fe1
           {/* Auth Section - Desktop Only */}
           {!isMobile && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
