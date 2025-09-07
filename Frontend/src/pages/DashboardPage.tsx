@@ -1,5 +1,6 @@
 import React from 'react';
 import { Container, Typography, Box, Grid, Card, CardContent, Button, Chip } from '@mui/material';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import AddIcon from '@mui/icons-material/Add';
@@ -36,7 +37,7 @@ const DashboardPage: React.FC = () => {
               <Typography variant="h6" color="text.secondary" gutterBottom>
                 Cars Listed
               </Typography>
-              <Button variant="outlined" startIcon={<AddIcon />} sx={{ mt: 2 }}>
+              <Button component={Link} to="/cars/new" variant="outlined" startIcon={<AddIcon />} sx={{ mt: 2 }}>
                 Add New Car
               </Button>
             </CardContent>
