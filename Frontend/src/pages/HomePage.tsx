@@ -293,6 +293,10 @@ const HomePage: React.FC = () => {
                 }}
               >
                 <Box
+                  component={Link}
+                  to="/cars"
+                  role="button"
+                  aria-label="Browse cars"
                   className="fade-in-up"
                   sx={{
                     background: 'rgba(255, 255, 255, 0.15)',
@@ -304,7 +308,9 @@ const HomePage: React.FC = () => {
                     animation: 'float 3s ease-in-out infinite',
                     maxWidth: { xs: '100%', md: '400px' },
                     width: '100%',
-                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                    cursor: 'pointer',
+                    textDecoration: 'none'
                   }}
                 >
                   <DirectionsCarIcon 

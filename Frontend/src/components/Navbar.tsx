@@ -75,32 +75,37 @@ const Navbar: React.FC = () => {
   const getBreadcrumbs = () => {
     const path = location.pathname;
     const breadcrumbs = [{ label: 'Home', href: '/', icon: <HomeIcon /> }];
-    
+
     if (path === '/cars') {
       breadcrumbs.push({ label: 'Browse Cars', href: '/cars', icon: <DirectionsCarOutlinedIcon /> });
     } else if (path.startsWith('/cars/')) {
-      breadcrumbs.push({ label: 'Browse Cars', href: '/cars', icon: <DirectionsCarOutlinedIcon /> });
-      breadcrumbs.push({ label: 'Car Details', href: path, icon: <DirectionsCarIcon /> });
+      breadcrumbs.push(
+        { label: 'Browse Cars', href: '/cars', icon: <DirectionsCarOutlinedIcon /> },
+        { label: 'Car Details', href: path, icon: <DirectionsCarIcon /> }
+      );
     } else if (path === '/dashboard') {
       breadcrumbs.push({ label: 'Dashboard', href: '/dashboard', icon: <DashboardIcon /> });
     } else if (path === '/login') {
       breadcrumbs.push({ label: 'Login', href: '/login', icon: <LoginIcon /> });
     } else if (path === '/register') {
       breadcrumbs.push({ label: 'Register', href: '/register', icon: <PersonAddIcon /> });
+    } else if (path === '/account') {
+      breadcrumbs.push({ label: 'Account', href: '/account', icon: <PersonIcon /> });
     }
-    
+
     return breadcrumbs;
   };
 
-  const breadcrumbs = getBreadcrumbs();
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
 
   const navigationItems = [
     { label: 'Home', href: '/', icon: <HomeIcon /> },
     { label: 'Browse Cars', href: '/cars', icon: <DirectionsCarOutlinedIcon /> },
   ];
 
-  const authItems = user 
+  const authItems = user
     ? [
         { label: 'Dashboard', href: '/dashboard', icon: <DashboardIcon /> },
         { label: 'Account', href: '/account', icon: <PersonAddIcon /> },
@@ -190,7 +195,7 @@ const Navbar: React.FC = () => {
                 </Avatar>
                 <Box>
                   <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                    {user.name}
+                    {user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim()}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {user.email}
@@ -294,15 +299,15 @@ const Navbar: React.FC = () => {
 
   return (
     <>
-    <AppBar 
-      position="static" 
-      sx={{ 
-        background: 'linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)',
-        boxShadow: '0 4px 20px rgba(25, 118, 210, 0.3)',
-        backdropFilter: 'blur(10px)'
-      }}
-    >
-      <Toolbar sx={{ py: 1 }}>
+      <AppBar 
+        position="static" 
+        sx={{ 
+          background: 'linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)',
+          boxShadow: '0 4px 20px rgba(25, 118, 210, 0.3)',
+          backdropFilter: 'blur(10px)'
+        }}
+      >
+        <Toolbar sx={{ py: 1 }}>
           {/* Mobile Menu Button */}
           {isMobile && (
             <IconButton
@@ -319,22 +324,22 @@ const Navbar: React.FC = () => {
           {/* Logo and Brand */}
           <Box sx={{ display: 'flex', alignItems: 'center', mr: 3 }}>
             <DirectionsCarIcon sx={{ mr: 1, fontSize: 32, color: 'white' }} />
-        <Typography 
-          variant="h5" 
+            <Typography 
+              variant="h5" 
               component={Link}
               to="/"
-          sx={{ 
-            fontWeight: 700,
+              sx={{ 
+                fontWeight: 700,
                 letterSpacing: '0.5px',
-              textDecoration: 'none', 
-              color: 'white',
+                textDecoration: 'none', 
+                color: 'white',
                 '&:hover': {
                   opacity: 0.9
                 }
-            }}
-          >
-            FleetHub
-        </Typography>
+              }}
+            >
+              FleetHub
+            </Typography>
           </Box>
 
           {/* Desktop Navigation */}
@@ -389,6 +394,49 @@ const Navbar: React.FC = () => {
           {/* Spacer */}
           <Box sx={{ flexGrow: 1 }} />
 
+<<<<<<< HEAD
+=======
+          {/* Rental/Sale Toggle - Desktop Only */}
+          {!isMobile && (
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={isRental}
+                  onChange={(e) => setIsRental(e.target.checked)}
+                  sx={{
+                    '& .MuiSwitch-switchBase.Mui-checked': {
+                      color: '#ff9800',
+                      '& + .MuiSwitch-track': {
+                        backgroundColor: '#ff9800',
+                      },
+                    },
+                    '& .MuiSwitch-track': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                    },
+                  }}
+                />
+              }
+              label={
+                <Chip 
+                  label={isRental ? "Rental" : "Sale"}
+                  size="small"
+                  sx={{ 
+                    color: 'white',
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    fontWeight: 500
+                  }} 
+                />
+              }
+              sx={{ 
+                mr: 3, 
+                '& .MuiFormControlLabel-label': {
+                  margin: 0
+                }
+              }}
+            />
+          )}
+
+>>>>>>> e22d8735b1451ef710ad4f21bbf7e8321afc9fe1
           {/* Auth Section - Desktop Only */}
           {!isMobile && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -456,7 +504,7 @@ const Navbar: React.FC = () => {
                     {/* User Info Header */}
                     <Box sx={{ px: 2, py: 1.5, borderBottom: '1px solid rgba(0, 0, 0, 0.08)' }}>
                       <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                        {user.name}
+                        {user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim()}
                       </Typography>
                       <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                         {user.email}
@@ -535,7 +583,7 @@ const Navbar: React.FC = () => {
               )}
             </Box>
           )}
-      </Toolbar>
+        </Toolbar>
 
         {/* Breadcrumbs - Show on desktop when not on home page */}
         {!isMobile && location.pathname !== '/' && (
@@ -548,15 +596,15 @@ const Navbar: React.FC = () => {
                 }
               }}
             >
-              {breadcrumbs.map((breadcrumb, index) => (
+              {getBreadcrumbs().map((breadcrumb, index) => (
                 <Button
                   key={breadcrumb.label}
                   component={Link}
                   to={breadcrumb.href}
                   startIcon={breadcrumb.icon}
                   sx={{
-                    color: index === breadcrumbs.length - 1 ? 'white' : 'rgba(255, 255, 255, 0.8)',
-                    fontWeight: index === breadcrumbs.length - 1 ? 600 : 400,
+                    color: index === getBreadcrumbs().length - 1 ? 'white' : 'rgba(255, 255, 255, 0.8)',
+                    fontWeight: index === getBreadcrumbs().length - 1 ? 600 : 400,
                     textTransform: 'none',
                     fontSize: '0.875rem',
                     '&:hover': {
@@ -571,7 +619,7 @@ const Navbar: React.FC = () => {
             </Breadcrumbs>
           </Box>
         )}
-    </AppBar>
+      </AppBar>
 
       {/* Mobile Drawer */}
       <Drawer
