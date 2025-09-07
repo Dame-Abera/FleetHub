@@ -27,10 +27,12 @@ import {
   CheckCircle as CheckCircleIcon,
   ArrowForward as ArrowForwardIcon
 } from '@mui/icons-material';
+import { useAuth } from '../contexts/AuthContext';
 
 const HomePage: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { user } = useAuth();
 
   const features = [
     {
@@ -228,7 +230,7 @@ const HomePage: React.FC = () => {
             variant="outlined"
             size="large"
             component={Link}
-            to="/register"
+            to={user ? "/dashboard" : "/register"}
                   sx={{ 
                     py: 1.5, 
                     px: 4,
