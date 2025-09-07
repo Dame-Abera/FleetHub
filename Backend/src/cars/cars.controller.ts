@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, UploadedFiles, UseInterceptors, Logger, BadRequestException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { CarsService } from './cars.service';
 import { CreateCarDto } from './dto/create-car.dto';
@@ -14,6 +14,8 @@ import type { Express } from 'express';
 @ApiTags('cars')
 @Controller('cars')
 export class CarsController {
+  private readonly logger = new Logger(CarsController.name);
+
   constructor(private readonly carsService: CarsService) {}
 
   @Post()
@@ -51,20 +53,49 @@ export class CarsController {
       required: ['name', 'brand', 'category'],
     },
   })
-  create(
+  async create(
     @Body() createCarDto: CreateCarDto,
     @GetUser() user: User,
     @UploadedFiles() files?: Array<Express.Multer.File>,
   ) {
-    const baseUrl = process.env.PUBLIC_BASE_URL || 'http://localhost:3001';
-    if (files && files.length > 0) {
-      const urls = files.map((f) => {
-        const rel = f.path.split('uploads').pop()?.replace(/\\/g, '/');
-        return `${baseUrl}/uploads${rel}`;
-      });
-      createCarDto.images = urls;
+    try {
+      this.logger.log(`Creating car listing for user ${user.id}: ${createCarDto.name}`);
+      
+      const baseUrl = process.env.PUBLIC_BASE_URL || 'http://localhost:3001';
+      
+      // Handle file uploads
+      if (files && files.length > 0) {
+        this.logger.log(`Processing ${files.length} uploaded files`);
+        const urls = files.map((f) => {
+          const rel = f.path.split('uploads').pop()?.replace(/\\/g, '/');
+          return `${baseUrl}/uploads${rel}`;
+        });
+        createCarDto.images = urls;
+      } else {
+        createCarDto.images = [];
+      }
+
+      // Validate that at least one option is selected
+      if (!createCarDto.availableForRental && !createCarDto.availableForSale) {
+        throw new BadRequestException('Car must be available for either rental or sale');
+      }
+
+      // Validate prices based on availability
+      if (createCarDto.availableForRental && (!createCarDto.rentalPricePerDay || createCarDto.rentalPricePerDay <= 0)) {
+        throw new BadRequestException('Rental price per day is required when car is available for rental');
+      }
+
+      if (createCarDto.availableForSale && (!createCarDto.salePrice || createCarDto.salePrice <= 0)) {
+        throw new BadRequestException('Sale price is required when car is available for sale');
+      }
+
+      const result = await this.carsService.create(createCarDto, user);
+      this.logger.log(`Successfully created car listing with ID: ${result.id}`);
+      return result;
+    } catch (error) {
+      this.logger.error(`Failed to create car listing for user ${user.id}:`, error);
+      throw error;
     }
-    return this.carsService.create(createCarDto, user);
   }
 
   @Get()
