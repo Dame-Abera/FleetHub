@@ -77,10 +77,10 @@ const Navbar: React.FC = () => {
     const breadcrumbs = [{ label: 'Home', href: '/', icon: <HomeIcon /> }];
 
     if (path === '/cars') {
-      breadcrumbs.push({ label: 'Cars', href: '/cars', icon: <DirectionsCarOutlinedIcon /> });
+      breadcrumbs.push({ label: 'Browse Cars', href: '/cars', icon: <DirectionsCarOutlinedIcon /> });
     } else if (path.startsWith('/cars/')) {
       breadcrumbs.push(
-        { label: 'Cars', href: '/cars', icon: <DirectionsCarOutlinedIcon /> },
+        { label: 'Browse Cars', href: '/cars', icon: <DirectionsCarOutlinedIcon /> },
         { label: 'Car Details', href: path, icon: <DirectionsCarIcon /> }
       );
     } else if (path === '/dashboard') {
@@ -102,7 +102,7 @@ const Navbar: React.FC = () => {
 
   const navigationItems = [
     { label: 'Home', href: '/', icon: <HomeIcon /> },
-    { label: 'Cars', href: '/cars', icon: <DirectionsCarOutlinedIcon /> },
+    { label: 'Browse Cars', href: '/cars', icon: <DirectionsCarOutlinedIcon /> },
   ];
 
   const authItems = user
@@ -117,18 +117,37 @@ const Navbar: React.FC = () => {
       ];
 
   const drawer = (
-    <Box sx={{ width: 250 }}>
-      <Box sx={{ p: 2, borderBottom: '1px solid rgba(0, 0, 0, 0.12)' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+    <Box sx={{ width: 280, height: '100%', bgcolor: 'background.paper' }}>
+      <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <DirectionsCarIcon sx={{ mr: 1, color: 'primary.main' }} />
           <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main' }}>
             FleetHub
           </Typography>
-          <IconButton onClick={handleDrawerToggle}>
-            <CloseIcon />
-          </IconButton>
         </Box>
+        <IconButton onClick={handleDrawerToggle}>
+          <CloseIcon />
+        </IconButton>
       </Box>
-
+      
+      <Divider />
+      
+      <Box sx={{ p: 2 }}>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={isRental}
+              onChange={(e) => setIsRental(e.target.checked)}
+              color="primary"
+            />
+          }
+          label={isRental ? "Rental Mode" : "Sale Mode"}
+          sx={{ mb: 2 }}
+        />
+      </Box>
+      
+      <Divider />
+      
       <List>
         {navigationItems.map((item) => (
           <ListItem key={item.label} disablePadding>
@@ -172,11 +191,11 @@ const Navbar: React.FC = () => {
                     fontWeight: 600
                   }}
                 >
-                  {user.name?.charAt(0)?.toUpperCase() || user.firstName?.charAt(0)?.toUpperCase() || 'U'}
+                  {user.name?.charAt(0)?.toUpperCase() || 'U'}
                 </Avatar>
                 <Box>
                   <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                    {user.name || `${user.firstName} ${user.lastName}`}
+                    {user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim()}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {user.email}
@@ -235,7 +254,7 @@ const Navbar: React.FC = () => {
                   handleLogout();
                   setMobileOpen(false);
                 }}
-      sx={{ 
+                sx={{
                   color: 'error.main',
                   '&:hover': {
                     backgroundColor: 'error.light',
@@ -259,7 +278,7 @@ const Navbar: React.FC = () => {
                   setMobileOpen(false);
                 }}
                 selected={item.href ? isActive(item.href) : false}
-          sx={{ 
+                sx={{
                   '&.Mui-selected': {
                     backgroundColor: 'primary.light',
                     '&:hover': {
@@ -280,8 +299,15 @@ const Navbar: React.FC = () => {
 
   return (
     <>
-      <AppBar position="static" sx={{ backgroundColor: '#1976d2' }}>
-        <Toolbar>
+      <AppBar 
+        position="static" 
+        sx={{ 
+          background: 'linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)',
+          boxShadow: '0 4px 20px rgba(25, 118, 210, 0.3)',
+          backdropFilter: 'blur(10px)'
+        }}
+      >
+        <Toolbar sx={{ py: 1 }}>
           {/* Mobile Menu Button */}
           {isMobile && (
             <IconButton
@@ -295,53 +321,74 @@ const Navbar: React.FC = () => {
             </IconButton>
           )}
 
-          {/* Logo */}
-          <Box sx={{ display: 'flex', alignItems: 'center', mr: 4 }}>
-            <DirectionsCarIcon sx={{ mr: 1, fontSize: 28 }} />
+          {/* Logo and Brand */}
+          <Box sx={{ display: 'flex', alignItems: 'center', mr: 3 }}>
+            <DirectionsCarIcon sx={{ mr: 1, fontSize: 32, color: 'white' }} />
             <Typography 
-              variant="h6" 
+              variant="h5" 
               component={Link}
-            to="/" 
+              to="/"
               sx={{ 
-                fontWeight: 700, 
-              textDecoration: 'none', 
-                color: 'inherit',
+                fontWeight: 700,
+                letterSpacing: '0.5px',
+                textDecoration: 'none', 
+                color: 'white',
                 '&:hover': {
-                  opacity: 0.8
+                  opacity: 0.9
                 }
-            }}
-          >
-            FleetHub
-        </Typography>
+              }}
+            >
+              FleetHub
+            </Typography>
           </Box>
 
-          {/* Navigation Links - Desktop Only */}
+          {/* Desktop Navigation */}
           {!isMobile && (
-            <Box sx={{ display: 'flex', gap: 1, mr: 4 }}>
-              {navigationItems.map((item) => (
-                <Button
-                  key={item.label}
-                  component={Link}
-                  to={item.href}
-                  startIcon={item.icon}
-                  sx={{
-                    color: 'white',
-                    fontWeight: 500,
-                    px: 2,
-                    py: 1,
-                    borderRadius: 2,
-                    backgroundColor: isActive(item.href) ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
-                    '&:hover': {
-                      backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                      transform: 'translateY(-1px)',
-                      transition: 'all 0.2s ease'
-                    }
-                  }}
-                >
-                  {item.label}
-                </Button>
-              ))}
-            </Box>
+            <>
+              {/* Home Button - Always Visible */}
+              <Button 
+                component={Link} 
+                to="/"
+                startIcon={<HomeIcon />}
+                sx={{
+                  color: 'white',
+                  fontWeight: 600,
+                  px: 2,
+                  py: 1,
+                  borderRadius: 2,
+                  backgroundColor: isActive('/') ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                    transform: 'translateY(-1px)',
+                    transition: 'all 0.2s ease'
+                  }
+                }}
+              >
+                Home
+              </Button>
+
+              {/* Other Navigation Items */}
+              <Button 
+                component={Link} 
+                to="/cars"
+                startIcon={<DirectionsCarOutlinedIcon />}
+                sx={{
+                  color: 'white',
+                  fontWeight: 500,
+                  px: 2,
+                  py: 1,
+                  borderRadius: 2,
+                  backgroundColor: isActive('/cars') ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                    transform: 'translateY(-1px)',
+                    transition: 'all 0.2s ease'
+                  }
+                }}
+              >
+                Browse Cars
+              </Button>
+            </>
           )}
 
           {/* Spacer */}
@@ -349,27 +396,27 @@ const Navbar: React.FC = () => {
 
           {/* Rental/Sale Toggle - Desktop Only */}
           {!isMobile && (
-        <FormControlLabel
-          control={
-            <Switch
-              checked={isRental}
-              onChange={(e) => setIsRental(e.target.checked)}
-              sx={{
-                '& .MuiSwitch-switchBase.Mui-checked': {
-                  color: '#ff9800',
-                  '& + .MuiSwitch-track': {
-                    backgroundColor: '#ff9800',
-                  },
-                },
-                '& .MuiSwitch-track': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                },
-              }}
-            />
-          }
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={isRental}
+                  onChange={(e) => setIsRental(e.target.checked)}
+                  sx={{
+                    '& .MuiSwitch-switchBase.Mui-checked': {
+                      color: '#ff9800',
+                      '& + .MuiSwitch-track': {
+                        backgroundColor: '#ff9800',
+                      },
+                    },
+                    '& .MuiSwitch-track': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                    },
+                  }}
+                />
+              }
               label={
                 <Chip 
-          label={isRental ? "Rental" : "Sale"}
+                  label={isRental ? "Rental" : "Sale"}
                   size="small"
                   sx={{ 
                     color: 'white',
@@ -378,13 +425,13 @@ const Navbar: React.FC = () => {
                   }} 
                 />
               }
-          sx={{ 
-            mr: 3, 
-            '& .MuiFormControlLabel-label': {
+              sx={{ 
+                mr: 3, 
+                '& .MuiFormControlLabel-label': {
                   margin: 0
-            }
-          }}
-        />
+                }
+              }}
+            />
           )}
 
           {/* Auth Section - Desktop Only */}
@@ -395,9 +442,9 @@ const Navbar: React.FC = () => {
                   {/* User Avatar Button */}
                   <IconButton
                     onClick={handleUserMenuOpen}
-            sx={{
+                    sx={{
                       p: 0,
-              '&:hover': {
+                      '&:hover': {
                         transform: 'scale(1.05)',
                         transition: 'transform 0.2s ease'
                       }
@@ -405,21 +452,21 @@ const Navbar: React.FC = () => {
                   >
                     <Avatar
                       src={user.avatar}
-                sx={{
+                      sx={{
                         width: 40,
                         height: 40,
                         border: '2px solid rgba(255, 255, 255, 0.3)',
                         bgcolor: 'rgba(255, 255, 255, 0.2)',
-                  color: 'white',
+                        color: 'white',
                         fontSize: '1.2rem',
                         fontWeight: 600,
-                  '&:hover': {
+                        '&:hover': {
                           border: '2px solid rgba(255, 255, 255, 0.5)',
                           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
                         }
                       }}
                     >
-                      {user.name?.charAt(0)?.toUpperCase() || user.firstName?.charAt(0)?.toUpperCase() || 'U'}
+                      {user.name?.charAt(0)?.toUpperCase() || 'U'}
                     </Avatar>
                   </IconButton>
 
@@ -437,12 +484,12 @@ const Navbar: React.FC = () => {
                         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
                         border: '1px solid rgba(0, 0, 0, 0.08)',
                         '& .MuiMenuItem-root': {
-                  px: 2,
+                          px: 2,
                           py: 1.5,
                           borderRadius: 1,
                           mx: 1,
                           my: 0.5,
-                  '&:hover': {
+                          '&:hover': {
                             backgroundColor: 'rgba(25, 118, 210, 0.08)',
                           }
                         }
@@ -454,7 +501,7 @@ const Navbar: React.FC = () => {
                     {/* User Info Header */}
                     <Box sx={{ px: 2, py: 1.5, borderBottom: '1px solid rgba(0, 0, 0, 0.08)' }}>
                       <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                        {user.name || `${user.firstName} ${user.lastName}`}
+                        {user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim()}
                       </Typography>
                       <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                         {user.email}
@@ -485,98 +532,91 @@ const Navbar: React.FC = () => {
                       <ListItemText>Logout</ListItemText>
                     </MenuItem>
                   </Menu>
-            </>
-          ) : (
-            <>
-              <Button 
-                component={Link} 
-                to="/login"
+                </>
+              ) : (
+                <>
+                  <Button 
+                    component={Link} 
+                    to="/login"
                     startIcon={<LoginIcon />}
-                sx={{
-                  color: 'white',
-                  fontWeight: 500,
-                  px: 2,
-                  py: 1,
-                  borderRadius: 2,
+                    sx={{
+                      color: 'white',
+                      fontWeight: 500,
+                      px: 2,
+                      py: 1,
+                      borderRadius: 2,
                       backgroundColor: isActive('/login') ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
-                  '&:hover': {
+                      '&:hover': {
                         backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                    transform: 'translateY(-1px)',
-                    transition: 'all 0.2s ease'
-                  }
-                }}
-              >
-                Login
-              </Button>
-              <Button 
-                component={Link} 
-                to="/register"
+                        transform: 'translateY(-1px)',
+                        transition: 'all 0.2s ease'
+                      }
+                    }}
+                  >
+                    Login
+                  </Button>
+                  <Button 
+                    component={Link} 
+                    to="/register"
                     startIcon={<PersonAddIcon />}
-                sx={{
-                  color: 'white',
-                  fontWeight: 600,
-                  px: 3,
-                  py: 1,
-                  borderRadius: 2,
-                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
-                  '&:hover': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.25)',
-                    transform: 'translateY(-1px)',
-                    transition: 'all 0.2s ease'
-                  }
-                }}
-              >
-                Register
-              </Button>
-            </>
+                    sx={{
+                      color: 'white',
+                      fontWeight: 600,
+                      px: 3,
+                      py: 1,
+                      borderRadius: 2,
+                      backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                      border: '1px solid rgba(255, 255, 255, 0.3)',
+                      '&:hover': {
+                        backgroundColor: 'rgba(255, 255, 255, 0.25)',
+                        transform: 'translateY(-1px)',
+                        transition: 'all 0.2s ease'
+                      }
+                    }}
+                  >
+                    Register
+                  </Button>
+                </>
+              )}
+            </Box>
           )}
-        </Box>
-          )}
-      </Toolbar>
+        </Toolbar>
 
         {/* Breadcrumbs - Show on desktop when not on home page */}
         {!isMobile && location.pathname !== '/' && (
           <Box sx={{ px: 3, pb: 1 }}>
-            <Breadcrumbs
-              separator={<NavigateNextIcon fontSize="small" />}
-              sx={{
+            <Breadcrumbs 
+              separator={<NavigateNextIcon fontSize="small" sx={{ color: 'rgba(255, 255, 255, 0.7)' }} />}
+              sx={{ 
                 '& .MuiBreadcrumbs-separator': {
-                  color: 'rgba(255, 255, 255, 0.7)',
-                },
-                '& .MuiBreadcrumbs-li': {
-                  '& .MuiChip-root': {
-                    color: 'white',
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                    '&:hover': {
-                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                    },
-                  },
-                },
+                  color: 'rgba(255, 255, 255, 0.7)'
+                }
               }}
             >
               {getBreadcrumbs().map((breadcrumb, index) => (
-                <Chip
-                  key={index}
+                <Button
+                  key={breadcrumb.label}
                   component={Link}
                   to={breadcrumb.href}
-                  label={breadcrumb.label}
-                  icon={breadcrumb.icon}
-                  size="small"
-                  clickable
+                  startIcon={breadcrumb.icon}
                   sx={{
-                    color: 'white',
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    color: index === getBreadcrumbs().length - 1 ? 'white' : 'rgba(255, 255, 255, 0.8)',
+                    fontWeight: index === getBreadcrumbs().length - 1 ? 600 : 400,
+                    textTransform: 'none',
+                    fontSize: '0.875rem',
                     '&:hover': {
-                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                    },
+                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                      color: 'white'
+                    }
                   }}
-                />
+                >
+                  {breadcrumb.label}
+                </Button>
               ))}
             </Breadcrumbs>
           </Box>
         )}
-    </AppBar>
+      </AppBar>
 
       {/* Mobile Drawer */}
       <Drawer
@@ -588,10 +628,9 @@ const Navbar: React.FC = () => {
           keepMounted: true, // Better open performance on mobile.
         }}
         sx={{
-          display: { xs: 'block', md: 'none' },
           '& .MuiDrawer-paper': {
             boxSizing: 'border-box',
-            width: 250,
+            width: 280,
           },
         }}
       >
