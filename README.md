@@ -1,9 +1,16 @@
-# 🚗 Car Rental & Sale Platform Backend
+# 🚗 FleetHub - Car Rental & Sale Platform
 
-A modern NestJS backend with Prisma ORM for a car rental and sale marketplace platform.
+A modern full-stack car rental and sale marketplace platform built with React and NestJS.
 
 ## 🏗️ Architecture
 
+### Frontend
+- **Framework**: React with TypeScript
+- **Build Tool**: Vite
+- **Styling**: CSS with modern design
+- **State Management**: React Context API
+
+### Backend
 - **Framework**: NestJS with TypeScript
 - **Database**: PostgreSQL with Prisma ORM
 - **Authentication**: JWT-based auth system
@@ -29,13 +36,21 @@ A modern NestJS backend with Prisma ORM for a car rental and sale marketplace pl
 
 ## 🚀 Quick Start
 
-### 1. Install Dependencies
+### 1. Clone Repository
 
 ```bash
+git clone <repository-url>
+cd FleetHub
+```
+
+### 2. Backend Setup
+
+```bash
+cd Backend
 npm install
 ```
 
-### 2. Environment Setup
+### 3. Environment Setup
 
 Copy the environment file and configure your database:
 
@@ -50,7 +65,7 @@ DATABASE_URL="postgresql://username:password@localhost:5432/car_marketplace?sche
 JWT_SECRET=your-super-secret-jwt-key-here
 ```
 
-### 3. Database Setup
+### 4. Database Setup
 
 ```bash
 # Generate Prisma client
@@ -66,15 +81,29 @@ npm run db:migrate
 npm run db:studio
 ```
 
-### 4. Start Development Server
+### 5. Start Backend Server
 
 ```bash
 npm run start:dev
 ```
 
-The API will be available at:
-- **API**: http://localhost:3001
-- **Documentation**: http://localhost:3001/api
+### 6. Frontend Setup
+
+```bash
+cd ../frontend
+npm install
+```
+
+### 7. Start Frontend Development Server
+
+```bash
+npm run dev
+```
+
+The application will be available at:
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:3001
+- **API Documentation**: http://localhost:3001/api
 
 ## 📊 Database Models
 
@@ -115,12 +144,19 @@ price: Decimal     // Sale amount
 
 ## 🔧 Available Scripts
 
+### Backend Scripts
 - `npm run start:dev` - Development server with hot reload
 - `npm run build` - Build for production
 - `npm run db:generate` - Generate Prisma client
 - `npm run db:push` - Push schema changes to database
 - `npm run db:migrate` - Run database migrations
 - `npm run db:studio` - Open Prisma Studio (database GUI)
+
+### Frontend Scripts
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
 
 ## 🌐 API Endpoints
 
@@ -203,6 +239,27 @@ CREATE INDEX idx_bookings_dates ON bookings(startDate, endDate);
 4. Set up proper CORS origins
 5. Enable rate limiting
 6. Set up monitoring and logging
+
+## 🎯 Features
+
+### User Features
+- **User Registration & Authentication**: Secure JWT-based auth
+- **Car Browsing**: Search and filter available cars
+- **Car Details**: View comprehensive car information with images
+- **Rental Bookings**: Book cars for specific date ranges
+- **Purchase Cars**: Buy cars directly from the platform
+- **User Dashboard**: Manage bookings and profile
+
+### Owner Features
+- **Car Management**: Add, edit, and delete car listings
+- **Dual Availability**: Set cars for both rental and sale
+- **Image Upload**: Multiple car images with proper storage
+- **Booking Management**: View and manage rental bookings
+- **Sales Tracking**: Monitor car sales and transactions
+
+### Admin Features
+- **Platform Management**: Oversee all users and transactions
+- **Content Moderation**: Manage car listings and user accounts
 
 ## 🤝 Contributing
 
