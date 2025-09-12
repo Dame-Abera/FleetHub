@@ -50,4 +50,60 @@ export class RegisterDto {
   @IsOptional()
   @IsString()
   phone?: string;
+
+  @ApiPropertyOptional({ 
+    description: 'User address',
+    example: '123 Main St'
+  })
+  @IsOptional()
+  @IsString()
+  address?: string;
+
+  @ApiPropertyOptional({ 
+    description: 'User city',
+    example: 'New York'
+  })
+  @IsOptional()
+  @IsString()
+  city?: string;
+
+  @ApiPropertyOptional({ 
+    description: 'User state',
+    example: 'NY'
+  })
+  @IsOptional()
+  @IsString()
+  state?: string;
+
+  @ApiPropertyOptional({ 
+    description: 'User ZIP code',
+    example: '10001'
+  })
+  @IsOptional()
+  @IsString()
+  zipCode?: string;
+
+  @ApiPropertyOptional({ 
+    description: 'User country',
+    example: 'USA'
+  })
+  @IsOptional()
+  @IsString()
+  country?: string;
+
+  @ApiPropertyOptional({ 
+    description: 'User website',
+    example: 'https://example.com'
+  })
+  @IsOptional()
+  @IsString()
+  website?: string;
+
+  @ApiPropertyOptional({ 
+    description: 'User bio',
+    example: 'Car enthusiast and dealer'
+  })
+  @IsOptional()
+  @IsString()
+  bio?: string;
 }

@@ -198,6 +198,8 @@ const CarDetailPage: React.FC = () => {
 
                 <Box sx={{ mt: 3 }}>
                   <Button
+                    component={Link}
+                    to={`/contact/${car.postedBy?.id}`}
                     variant="contained"
                     size="large"
                     fullWidth

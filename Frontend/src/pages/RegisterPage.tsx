@@ -9,7 +9,15 @@ const RegisterPage: React.FC = () => {
     lastName: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    phone: '',
+    address: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    country: '',
+    website: '',
+    bio: ''
   });
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -28,7 +36,19 @@ const RegisterPage: React.FC = () => {
       return;
     }
     try {
-      await register(formData.email, formData.password, formData.firstName, formData.lastName);
+      await register({
+        name: `${formData.firstName} ${formData.lastName}`,
+        email: formData.email,
+        password: formData.password,
+        phone: formData.phone,
+        address: formData.address,
+        city: formData.city,
+        state: formData.state,
+        zipCode: formData.zipCode,
+        country: formData.country,
+        website: formData.website,
+        bio: formData.bio
+      });
       navigate('/dashboard');
     } catch (error) {
       console.error('Registration failed:', error);
@@ -106,6 +126,78 @@ const RegisterPage: React.FC = () => {
               id="confirmPassword"
               autoComplete="new-password"
               value={formData.confirmPassword}
+              onChange={handleChange}
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              margin="normal"
+              fullWidth
+              name="phone"
+              label="Phone Number"
+              type="tel"
+              value={formData.phone}
+              onChange={handleChange}
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              margin="normal"
+              fullWidth
+              name="address"
+              label="Address"
+              value={formData.address}
+              onChange={handleChange}
+              sx={{ mb: 2 }}
+            />
+            <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+              <TextField
+                fullWidth
+                name="city"
+                label="City"
+                value={formData.city}
+                onChange={handleChange}
+              />
+              <TextField
+                fullWidth
+                name="state"
+                label="State"
+                value={formData.state}
+                onChange={handleChange}
+              />
+            </Box>
+            <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+              <TextField
+                fullWidth
+                name="zipCode"
+                label="ZIP Code"
+                value={formData.zipCode}
+                onChange={handleChange}
+              />
+              <TextField
+                fullWidth
+                name="country"
+                label="Country"
+                value={formData.country}
+                onChange={handleChange}
+              />
+            </Box>
+            <TextField
+              margin="normal"
+              fullWidth
+              name="website"
+              label="Website (optional)"
+              type="url"
+              value={formData.website}
+              onChange={handleChange}
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              margin="normal"
+              fullWidth
+              name="bio"
+              label="Bio (optional)"
+              multiline
+              rows={3}
+              value={formData.bio}
               onChange={handleChange}
               sx={{ mb: 3 }}
             />

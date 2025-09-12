@@ -13,6 +13,13 @@ interface User {
   role: string;
   phone?: string;
   avatar?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  country?: string;
+  website?: string;
+  bio?: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -30,12 +37,26 @@ interface RegisterData {
   password: string;
   role?: string;
   phone?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  country?: string;
+  website?: string;
+  bio?: string;
 }
 
 interface UpdateProfileData {
   name?: string;
   phone?: string;
   avatar?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  country?: string;
+  website?: string;
+  bio?: string;
 }
 
 interface AuthContextType {

@@ -76,6 +76,13 @@ model User {
   role         UserRole @default(CUSTOMER)
   phone        String?
   avatar       String?
+  address      String?
+  city         String?
+  state        String?
+  zipCode      String?
+  country      String?
+  website      String?
+  bio          String?
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

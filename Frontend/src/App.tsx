@@ -7,6 +7,7 @@ import Navbar from './components/Navbar';
 import HomePage from './pages/HomePage';
 import CarsPage from './pages/CarsPage';
 import CarDetailPage from './pages/CarDetailPage';
+import ContactDetailsPage from './pages/ContactDetailsPage';
 import DashboardPage from './pages/DashboardPage';
 import AddCarPage from './pages/AddCarPage';
 import LoginPage from './pages/LoginPage';
@@ -37,6 +38,7 @@ function App() {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/cars" element={<CarsPage />} />
                 <Route path="/cars/:id" element={<CarDetailPage />} />
+                <Route path="/contact/:userId" element={<ContactDetailsPage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/cars/new" element={<AddCarPage />} />
                 <Route path="/account" element={<AccountPage />} />
