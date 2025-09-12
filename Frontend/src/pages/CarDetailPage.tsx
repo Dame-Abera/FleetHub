@@ -97,9 +97,9 @@ const CarDetailPage: React.FC = () => {
       )}
 
       {!loading && !error && car && (
-        <Grid container spacing={4}>
-          <Grid item xs={12} md={6}>
-            <Card>
+      <Grid container spacing={4}>
+        <Grid item xs={12} md={6}>
+          <Card>
               {car.images && car.images.length > 0 ? (
                 <CardMedia
                   component="img"
@@ -109,81 +109,81 @@ const CarDetailPage: React.FC = () => {
                 />
               ) : (
                 <Box sx={{ textAlign: 'center', py: 8 }}>
-                  <DirectionsCarIcon sx={{ fontSize: 200, color: 'primary.main', mb: 2 }} />
+              <DirectionsCarIcon sx={{ fontSize: 200, color: 'primary.main', mb: 2 }} />
                 </Box>
               )}
               <CardContent sx={{ textAlign: 'center' }}>
-                <Typography variant="h4" gutterBottom>
+              <Typography variant="h4" gutterBottom>
                   {car.year ? `${car.year} ` : ''}{car.brand} {car.name}
-                </Typography>
-                <Typography variant="h3" color="primary" sx={{ fontWeight: 700 }}>
+              </Typography>
+              <Typography variant="h3" color="primary" sx={{ fontWeight: 700 }}>
                   {car.availableForSale && car.salePrice
                     ? `$${car.salePrice.toLocaleString()}`
                     : car.availableForRental && car.rentalPricePerDay
                       ? `$${car.rentalPricePerDay}/day`
                       : 'Price on request'}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
 
-          <Grid item xs={12} md={6}>
-            <Card>
-              <CardContent>
-                <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-                  Vehicle Details
-                </Typography>
-                <Divider sx={{ mb: 2 }} />
-
-                <Grid container spacing={2} sx={{ mb: 3 }}>
+        <Grid item xs={12} md={6}>
+          <Card>
+            <CardContent>
+              <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
+                Vehicle Details
+              </Typography>
+              <Divider sx={{ mb: 2 }} />
+              
+              <Grid container spacing={2} sx={{ mb: 3 }}>
                   {car.mileage != null && (
-                    <Grid item xs={6}>
-                      <Typography variant="body2" color="text.secondary">Mileage</Typography>
-                      <Typography variant="h6">{car.mileage.toLocaleString()} miles</Typography>
-                    </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="body2" color="text.secondary">Mileage</Typography>
+                  <Typography variant="h6">{car.mileage.toLocaleString()} miles</Typography>
+                </Grid>
                   )}
                   {car.fuelType && (
-                    <Grid item xs={6}>
-                      <Typography variant="body2" color="text.secondary">Fuel Type</Typography>
-                      <Typography variant="h6">{car.fuelType}</Typography>
-                    </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="body2" color="text.secondary">Fuel Type</Typography>
+                  <Typography variant="h6">{car.fuelType}</Typography>
+                </Grid>
                   )}
                   {car.transmission && (
-                    <Grid item xs={6}>
-                      <Typography variant="body2" color="text.secondary">Transmission</Typography>
-                      <Typography variant="h6">{car.transmission}</Typography>
-                    </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="body2" color="text.secondary">Transmission</Typography>
+                  <Typography variant="h6">{car.transmission}</Typography>
+                </Grid>
                   )}
                   {car.color && (
-                    <Grid item xs={6}>
-                      <Typography variant="body2" color="text.secondary">Color</Typography>
-                      <Typography variant="h6">{car.color}</Typography>
-                    </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="body2" color="text.secondary">Color</Typography>
+                  <Typography variant="h6">{car.color}</Typography>
+                </Grid>
                   )}
                   {car.seats != null && (
-                    <Grid item xs={6}>
+                <Grid item xs={6}>
                       <Typography variant="body2" color="text.secondary">Seats</Typography>
                       <Typography variant="h6">{car.seats}</Typography>
-                    </Grid>
+                </Grid>
                   )}
                   {car.location && (
-                    <Grid item xs={6}>
+                <Grid item xs={6}>
                       <Typography variant="body2" color="text.secondary">Location</Typography>
                       <Typography variant="h6">{car.location}</Typography>
-                    </Grid>
-                  )}
                 </Grid>
+                  )}
+              </Grid>
 
                 {featureList.length > 0 && (
                   <>
-                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                      Features
-                    </Typography>
-                    <Box sx={{ mb: 3 }}>
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                Features
+              </Typography>
+              <Box sx={{ mb: 3 }}>
                       {featureList.map((feature, index) => (
-                        <Chip key={index} label={feature} sx={{ mr: 1, mb: 1 }} />
-                      ))}
-                    </Box>
+                  <Chip key={index} label={feature} sx={{ mr: 1, mb: 1 }} />
+                ))}
+              </Box>
                   </>
                 )}
 
@@ -197,21 +197,21 @@ const CarDetailPage: React.FC = () => {
                 </Stack>
 
                 <Box sx={{ mt: 3 }}>
-                  <Button
+              <Button
                     component={Link}
                     to={`/contact/${car.postedBy?.id}`}
-                    variant="contained"
-                    size="large"
-                    fullWidth
-                    sx={{ py: 1.5 }}
-                  >
-                    Contact Seller
-                  </Button>
+                variant="contained"
+                size="large"
+                fullWidth
+                sx={{ py: 1.5 }}
+              >
+                Contact Seller
+              </Button>
                 </Box>
-              </CardContent>
-            </Card>
-          </Grid>
+            </CardContent>
+          </Card>
         </Grid>
+      </Grid>
       )}
     </Container>
   );

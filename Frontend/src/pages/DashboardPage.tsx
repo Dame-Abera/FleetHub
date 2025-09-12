@@ -24,7 +24,10 @@ import {
   ListItemAvatar,
   Divider,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
+  TextField,
+  Stack,
+  Snackbar
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -38,6 +41,8 @@ import PersonIcon from '@mui/icons-material/Person';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PendingIcon from '@mui/icons-material/Pending';
 import SellIcon from '@mui/icons-material/Sell';
+import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
+import SaveIcon from '@mui/icons-material/Save';
 
 // Define interfaces for dashboard data
 interface DashboardStats {
@@ -101,10 +106,22 @@ interface DashboardData {
 }
 
 const DashboardPage: React.FC = () => {
-  const { user } = useAuth();
+  const { user, updateProfile } = useAuth();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [contactForm, setContactForm] = useState({
+    phone: user?.phone || '',
+    address: user?.address || '',
+    city: user?.city || '',
+    state: user?.state || '',
+    zipCode: user?.zipCode || '',
+    country: user?.country || '',
+    website: user?.website || '',
+    bio: user?.bio || ''
+  });
+  const [saving, setSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -144,6 +161,41 @@ const DashboardPage: React.FC = () => {
   useEffect(() => {
     fetchDashboardData();
   }, []);
+
+  // Update contact form when user data changes
+  useEffect(() => {
+    if (user) {
+      setContactForm({
+        phone: user.phone || '',
+        address: user.address || '',
+        city: user.city || '',
+        state: user.state || '',
+        zipCode: user.zipCode || '',
+        country: user.country || '',
+        website: user.website || '',
+        bio: user.bio || ''
+      });
+    }
+  }, [user]);
+
+  const handleContactChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setContactForm({
+      ...contactForm,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSaveContact = async () => {
+    try {
+      setSaving(true);
+      await updateProfile(contactForm);
+      setSaveSuccess(true);
+    } catch (error) {
+      console.error('Failed to save contact details:', error);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -274,6 +326,123 @@ const DashboardPage: React.FC = () => {
         </Button>
       </Box>
 
+      {/* Contact Details Card */}
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12}>
+          <Card>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                <ContactPhoneIcon sx={{ mr: 1, color: 'primary.main' }} />
+                <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                  Contact Information
+                </Typography>
+              </Box>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                Complete your contact details to help potential buyers and renters reach you easily.
+              </Typography>
+              
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Phone Number"
+                    name="phone"
+                    value={contactForm.phone}
+                    onChange={handleContactChange}
+                    placeholder="+1 (555) 123-4567"
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Website"
+                    name="website"
+                    value={contactForm.website}
+                    onChange={handleContactChange}
+                    placeholder="https://example.com"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Address"
+                    name="address"
+                    value={contactForm.address}
+                    onChange={handleContactChange}
+                    placeholder="123 Main Street"
+                  />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <TextField
+                    fullWidth
+                    label="City"
+                    name="city"
+                    value={contactForm.city}
+                    onChange={handleContactChange}
+                    placeholder="New York"
+                  />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <TextField
+                    fullWidth
+                    label="State"
+                    name="state"
+                    value={contactForm.state}
+                    onChange={handleContactChange}
+                    placeholder="NY"
+                  />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <TextField
+                    fullWidth
+                    label="ZIP Code"
+                    name="zipCode"
+                    value={contactForm.zipCode}
+                    onChange={handleContactChange}
+                    placeholder="10001"
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Country"
+                    name="country"
+                    value={contactForm.country}
+                    onChange={handleContactChange}
+                    placeholder="United States"
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Bio"
+                    name="bio"
+                    value={contactForm.bio}
+                    onChange={handleContactChange}
+                    placeholder="Tell us about yourself..."
+                    multiline
+                    rows={2}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <Button
+                      variant="contained"
+                      startIcon={<SaveIcon />}
+                      onClick={handleSaveContact}
+                      disabled={saving}
+                      sx={{ minWidth: 120 }}
+                    >
+                      {saving ? 'Saving...' : 'Save Details'}
+                    </Button>
+                  </Box>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
       {/* Recent Activity */}
       <Grid container spacing={3}>
         {/* Recent Cars */}
@@ -394,6 +563,14 @@ const DashboardPage: React.FC = () => {
           </Card>
         </Grid>
       </Grid>
+
+      {/* Success Snackbar */}
+      <Snackbar
+        open={saveSuccess}
+        autoHideDuration={3000}
+        onClose={() => setSaveSuccess(false)}
+        message="Contact details saved successfully!"
+      />
     </Container>
   );
 };

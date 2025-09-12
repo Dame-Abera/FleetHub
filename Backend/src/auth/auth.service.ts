@@ -145,7 +145,18 @@ export class AuthService {
     });
   }
 
-  async updateProfile(userId: string, updateData: { name?: string; phone?: string; avatar?: string }) {
+  async updateProfile(userId: string, updateData: { 
+    name?: string; 
+    phone?: string; 
+    avatar?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+    country?: string;
+    website?: string;
+    bio?: string;
+  }) {
     return this.prisma.user.update({
       where: { id: userId },
       data: updateData,
@@ -155,6 +166,13 @@ export class AuthService {
         email: true,
         role: true,
         phone: true,
+        address: true,
+        city: true,
+        state: true,
+        zipCode: true,
+        country: true,
+        website: true,
+        bio: true,
         avatar: true,
         isActive: true,
         createdAt: true,

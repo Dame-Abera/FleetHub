@@ -37,13 +37,6 @@ interface RegisterData {
   password: string;
   role?: string;
   phone?: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  zipCode?: string;
-  country?: string;
-  website?: string;
-  bio?: string;
 }
 
 interface UpdateProfileData {
@@ -62,7 +55,7 @@ interface UpdateProfileData {
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
-  register: (userData: RegisterData) => Promise<void>;
+  register: (email: string, password: string, firstName: string, lastName: string) => Promise<void>;
   logout: () => void;
   updateProfile: (userData: UpdateProfileData) => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -129,8 +122,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const register = async (userData: RegisterData) => {
+  const register = async (email: string, password: string, firstName: string, lastName: string) => {
     try {
+      const userData = {
+        name: `${firstName} ${lastName}`,
+        email,
+        password
+      };
       const response = await axios.post<LoginResponse>('/auth/register', userData);
       const { access_token, user } = response.data;
       
