@@ -4,7 +4,11 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { Box } from '@mui/material';
 import { AuthProvider } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
+
 import ProtectedRoute from './components/ProtectedRoute';
+
+import AIChatWidget from './components/AIChatWidget';
+
 import HomePage from './pages/HomePage';
 import CarsPage from './pages/CarsPage';
 import CarDetailPage from './pages/CarDetailPage';
@@ -59,6 +63,8 @@ function App() {
                 <Route path="/register" element={<RegisterPage />} />
               </Routes>
             </Box>
+            {/* AI Chat Widget - Available on all pages */}
+            <AIChatWidget position="bottom-right" />
           </Box>
         </Router>
       </AuthProvider>

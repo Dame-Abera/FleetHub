@@ -11,7 +11,7 @@ export class AiController {
   @Post('chat')
   @ApiOperation({ summary: 'AI Chat Assistant' })
   async chat(@Body() body: { message: string; context?: any }) {
-    const response = await this.aiService.generateChatResponse(body.message, body.context);
+    const response = await this.aiService.enhancedChatbot(body.message, body.context);
     return { response };
   }
 

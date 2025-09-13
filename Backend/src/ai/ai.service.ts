@@ -186,6 +186,98 @@ export class AiService {
     }
   }
 
+  // Enhanced chatbot with multiple AI providers
+  async enhancedChatbot(message: string, context?: any): Promise<string> {
+    // Try Hugging Face first (most reliable)
+    try {
+      return await this.huggingFaceChat(message, context);
+    } catch (error) {
+      console.warn('Hugging Face failed, trying fallback:', error);
+      // Fallback to simple rule-based responses
+      return this.fallbackChatbot(message, context);
+    }
+  }
+
+  private async huggingFaceChat(message: string, context?: any): Promise<string> {
+    const apiKey = process.env.HUGGING_FACE_API_KEY;
+    
+    if (!apiKey) {
+      throw new Error('Hugging Face API key not configured');
+    }
+
+    // Use a lightweight model for fast responses
+    const model = "microsoft/DialoGPT-medium";
+    
+    const response = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        inputs: message,
+        parameters: {
+          max_length: 150,
+          temperature: 0.7,
+          do_sample: true,
+        }
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Hugging Face API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    if (Array.isArray(data) && data.length > 0) {
+      return data[0].generated_text || this.fallbackChatbot(message, context);
+    }
+    
+    return this.fallbackChatbot(message, context);
+  }
+
+  private fallbackChatbot(message: string, context?: any): string {
+    const lowerMessage = message.toLowerCase();
+    
+    // Car-related responses
+    if (lowerMessage.includes('car') || lowerMessage.includes('vehicle')) {
+      if (lowerMessage.includes('rent') || lowerMessage.includes('rental')) {
+        return "I can help you find the perfect rental car! What type of vehicle are you looking for? SUV, sedan, or something else?";
+      }
+      if (lowerMessage.includes('buy') || lowerMessage.includes('purchase') || lowerMessage.includes('sale')) {
+        return "Great! I can help you find cars for sale. What's your budget range and preferred car type?";
+      }
+      if (lowerMessage.includes('price') || lowerMessage.includes('cost')) {
+        return "Our cars are competitively priced! You can filter by price range on our cars page. What's your budget?";
+      }
+      return "I'd be happy to help you with car-related questions! Are you looking to rent or buy a vehicle?";
+    }
+    
+    // General greetings
+    if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
+      return "Hello! 👋 Welcome to FleetHub! I'm here to help you find the perfect car. How can I assist you today?";
+    }
+    
+    // Help requests
+    if (lowerMessage.includes('help') || lowerMessage.includes('support')) {
+      return "I'm here to help! I can assist you with:\n• Finding cars to rent or buy\n• Answering questions about our platform\n• Providing car recommendations\n\nWhat would you like to know?";
+    }
+    
+    // Booking questions
+    if (lowerMessage.includes('book') || lowerMessage.includes('reserve')) {
+      return "To book a car, simply click on any car listing and use the 'Book Now' button. You'll need to create an account first if you haven't already!";
+    }
+    
+    // Account questions
+    if (lowerMessage.includes('account') || lowerMessage.includes('login') || lowerMessage.includes('register')) {
+      return "You can create an account by clicking 'Register' in the top menu, or login if you already have one. It's free and takes just a minute!";
+    }
+    
+    // Default response
+    return "I'm here to help with your car rental and purchase needs! Feel free to ask me about our cars, booking process, or anything else related to FleetHub. What can I help you with?";
+  }
+
   private getBasePriceByMake(make: string): number {
     const basePrices: { [key: string]: number } = {
       'toyota': 25000,
