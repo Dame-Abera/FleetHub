@@ -205,8 +205,9 @@ export class AiService {
       throw new Error('Hugging Face API key not configured');
     }
 
-    // Use a lightweight model for fast responses
-    const model = "microsoft/DialoGPT-medium";
+    // Use a reliable model that's always available
+    // Try distilgpt2 first (better for conversations), fallback to gpt2
+    const model = "distilgpt2";
     
     const response = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
       method: 'POST',
@@ -217,21 +218,29 @@ export class AiService {
       body: JSON.stringify({
         inputs: message,
         parameters: {
-          max_length: 150,
+          max_length: 100,
           temperature: 0.7,
           do_sample: true,
+          pad_token_id: 50256,
         }
       })
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Hugging Face API error: ${response.status} - ${errorText}`);
       throw new Error(`Hugging Face API error: ${response.status}`);
     }
 
     const data = await response.json();
     
     if (Array.isArray(data) && data.length > 0) {
-      return data[0].generated_text || this.fallbackChatbot(message, context);
+      const generatedText = data[0].generated_text;
+      if (generatedText && generatedText.trim().length > 0) {
+        // Clean up the response and make it more conversational
+        const cleanResponse = generatedText.replace(message, '').trim();
+        return cleanResponse || this.fallbackChatbot(message, context);
+      }
     }
     
     return this.fallbackChatbot(message, context);
