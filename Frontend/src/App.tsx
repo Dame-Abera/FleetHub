@@ -3,7 +3,12 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Box } from '@mui/material';
 import { AuthProvider } from './contexts/AuthContext';
+
+import Navbar from './components/Navbar
+import AIChatWidget from './components/AIChatWidget';
+
 import Navbar from './components/Navbar';
+
 
 import ProtectedRoute from './components/ProtectedRoute';
 
