@@ -205,11 +205,19 @@ export class AiService {
       throw new Error('Hugging Face API key not configured');
     }
 
-    // Try multiple models in order of preference
+    // First, let's test if the API key works with a simple model
+    console.log('Testing Hugging Face API key...');
+    console.log('API Key present:', !!apiKey);
+    console.log('API Key length:', apiKey ? apiKey.length : 0);
+
+    // Try multiple models in order of preference - using models that are known to work with Inference API
     const models = [
-      "microsoft/DialoGPT-small",  // Smaller, more reliable version
-      "gpt2",                      // Fallback option
-      "distilgpt2"                 // Another fallback
+      "gpt2",                            // Simple GPT-2 model
+      "openai-community/gpt2",           // Full path to GPT-2
+      "distilgpt2",                      // Smaller GPT-2
+      "distilbert/distilgpt2",           // Full path to DistilGPT-2
+      "microsoft/DialoGPT-small",        // Conversational model
+      "facebook/blenderbot-400M-distill" // Another conversational option
     ];
 
     for (const model of models) {
@@ -225,30 +233,34 @@ export class AiService {
           body: JSON.stringify({
             inputs: message,
             parameters: {
-              max_length: 80,
+              max_length: 60,
               temperature: 0.7,
               do_sample: true,
-              pad_token_id: 50256,
+              return_full_text: false,
             }
           })
         });
 
-        if (response.ok) {
-          const data = await response.json();
-          
-          if (Array.isArray(data) && data.length > 0) {
-            const generatedText = data[0].generated_text;
-            if (generatedText && generatedText.trim().length > 0) {
-              // Clean up the response and make it more conversational
-              const cleanResponse = generatedText.replace(message, '').trim();
-              if (cleanResponse.length > 0) {
-                console.log(`Successfully used model: ${model}`);
-                return cleanResponse;
-              }
+        console.log(`Response status for ${model}: ${response.status}`);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`Model ${model} failed: ${response.status} - ${errorText}`);
+          continue;
+        }
+
+        const data = await response.json();
+        
+        if (Array.isArray(data) && data.length > 0) {
+          const generatedText = data[0].generated_text;
+          if (generatedText && generatedText.trim().length > 0) {
+            // Clean up the response and make it more conversational
+            const cleanResponse = generatedText.replace(message, '').trim();
+            if (cleanResponse.length > 0) {
+              console.log(`Successfully used model: ${model}`);
+              return cleanResponse;
             }
           }
-        } else {
-          console.warn(`Model ${model} failed with status: ${response.status}`);
         }
       } catch (error) {
         console.warn(`Model ${model} failed with error:`, error);

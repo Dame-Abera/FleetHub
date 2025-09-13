@@ -94,14 +94,93 @@ export class AiController {
         status: 'success', 
         message: 'AI service is working',
         response: response,
-        hasApiKey: !!process.env.HUGGING_FACE_API_KEY
+        hasApiKey: !!process.env.HUGGING_FACE_API_KEY,
+        apiKeyLength: process.env.HUGGING_FACE_API_KEY ? process.env.HUGGING_FACE_API_KEY.length : 0
       };
     } catch (error) {
       return { 
         status: 'error', 
         message: 'AI service test failed',
         error: error.message,
-        hasApiKey: !!process.env.HUGGING_FACE_API_KEY
+        hasApiKey: !!process.env.HUGGING_FACE_API_KEY,
+        apiKeyLength: process.env.HUGGING_FACE_API_KEY ? process.env.HUGGING_FACE_API_KEY.length : 0
+      };
+    }
+  }
+
+  @Get('test-hf')
+  @ApiOperation({ summary: 'Test Hugging Face API directly' })
+  async testHuggingFace() {
+    const apiKey = process.env.HUGGING_FACE_API_KEY;
+    
+    if (!apiKey) {
+      return { 
+        status: 'error', 
+        message: 'No Hugging Face API key found',
+        hasApiKey: false
+      };
+    }
+
+    try {
+      // Test with multiple model endpoints to find one that works
+      const testModels = [
+        'gpt2',
+        'openai-community/gpt2',
+        'distilgpt2',
+        'distilbert/distilgpt2',
+        'microsoft/DialoGPT-small'
+      ];
+
+      for (const model of testModels) {
+        console.log(`Testing model: ${model}`);
+        
+        const response = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            inputs: "Hello",
+            parameters: {
+              max_length: 20,
+              return_full_text: false,
+            }
+          })
+        });
+
+        console.log(`Model ${model} status: ${response.status}`);
+
+        if (response.ok) {
+          const data = await response.json();
+          return {
+            status: 'success',
+            message: `Hugging Face API is working with model: ${model}`,
+            workingModel: model,
+            statusCode: response.status,
+            hasApiKey: true,
+            apiKeyLength: apiKey.length,
+            response: data
+          };
+        }
+      }
+
+      // If no model worked, return the error
+      return {
+        status: 'error',
+        message: 'All Hugging Face models failed - API might be down or models unavailable',
+        statusCode: 404,
+        hasApiKey: true,
+        apiKeyLength: apiKey.length,
+        testedModels: testModels
+      };
+    } catch (error) {
+      return {
+        status: 'error',
+        message: 'Hugging Face API test failed',
+        error: error.message,
+        hasApiKey: true,
+        apiKeyLength: apiKey.length
       };
     }
   }
