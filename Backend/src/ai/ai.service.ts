@@ -205,35 +205,59 @@ export class AiService {
       throw new Error('Hugging Face API key not configured');
     }
 
-    // Use a lightweight model for fast responses
-    const model = "microsoft/DialoGPT-medium";
-    
-    const response = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        inputs: message,
-        parameters: {
-          max_length: 150,
-          temperature: 0.7,
-          do_sample: true,
+    // Try multiple models in order of preference
+    const models = [
+      "microsoft/DialoGPT-small",  // Smaller, more reliable version
+      "gpt2",                      // Fallback option
+      "distilgpt2"                 // Another fallback
+    ];
+
+    for (const model of models) {
+      try {
+        console.log(`Trying Hugging Face model: ${model}`);
+        
+        const response = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            inputs: message,
+            parameters: {
+              max_length: 80,
+              temperature: 0.7,
+              do_sample: true,
+              pad_token_id: 50256,
+            }
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          
+          if (Array.isArray(data) && data.length > 0) {
+            const generatedText = data[0].generated_text;
+            if (generatedText && generatedText.trim().length > 0) {
+              // Clean up the response and make it more conversational
+              const cleanResponse = generatedText.replace(message, '').trim();
+              if (cleanResponse.length > 0) {
+                console.log(`Successfully used model: ${model}`);
+                return cleanResponse;
+              }
+            }
+          }
+        } else {
+          console.warn(`Model ${model} failed with status: ${response.status}`);
         }
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`Hugging Face API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    
-    if (Array.isArray(data) && data.length > 0) {
-      return data[0].generated_text || this.fallbackChatbot(message, context);
+      } catch (error) {
+        console.warn(`Model ${model} failed with error:`, error);
+        continue; // Try next model
+      }
     }
     
+    // If all models fail, use fallback
+    console.log('All Hugging Face models failed, using fallback');
     return this.fallbackChatbot(message, context);
   }
 
