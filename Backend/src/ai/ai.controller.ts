@@ -84,4 +84,25 @@ export class AiController {
     const analysis = await this.aiService.analyzeMarketTrends(sampleData);
     return { analysis };
   }
+
+  @Get('test')
+  @ApiOperation({ summary: 'Test AI service connection' })
+  async testAiService() {
+    try {
+      const response = await this.aiService.enhancedChatbot("Hello, test message");
+      return { 
+        status: 'success', 
+        message: 'AI service is working',
+        response: response,
+        hasApiKey: !!process.env.HUGGING_FACE_API_KEY
+      };
+    } catch (error) {
+      return { 
+        status: 'error', 
+        message: 'AI service test failed',
+        error: error.message,
+        hasApiKey: !!process.env.HUGGING_FACE_API_KEY
+      };
+    }
+  }
 }
