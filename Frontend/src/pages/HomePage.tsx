@@ -15,6 +15,7 @@ import {
   useMediaQuery
 } from '@mui/material';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { 
   Search as SearchIcon,
   DirectionsCar as DirectionsCarIcon,
@@ -27,7 +28,6 @@ import {
   CheckCircle as CheckCircleIcon,
   ArrowForward as ArrowForwardIcon
 } from '@mui/icons-material';
-import { useAuth } from '../contexts/AuthContext';
 
 const HomePage: React.FC = () => {
   const theme = useTheme();
