@@ -13,7 +13,7 @@ import {
   InputAdornment,
   IconButton
 } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Email, Lock, Visibility, VisibilityOff } from '@mui/icons-material';
 
@@ -26,6 +26,7 @@ const LoginPage: React.FC = () => {
   
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,7 +35,9 @@ const LoginPage: React.FC = () => {
     
     try {
       await login(email, password);
-      navigate('/dashboard');
+      // Redirect to the page they were trying to access, or dashboard as fallback
+      const from = location.state?.from?.pathname || '/dashboard';
+      navigate(from, { replace: true });
     } catch (error: any) {
       setError(error.message || 'Login failed. Please check your credentials.');
     } finally {
