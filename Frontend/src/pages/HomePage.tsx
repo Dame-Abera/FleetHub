@@ -230,7 +230,7 @@ const HomePage: React.FC = () => {
             variant="outlined"
             size="large"
             component={Link}
-            to={user ? "/dashboard" : "/register"}
+            to={user ? "/dashboard" : "/login"}
                   sx={{ 
                     py: 1.5, 
                     px: 4,
