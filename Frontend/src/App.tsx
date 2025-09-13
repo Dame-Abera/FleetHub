@@ -3,8 +3,10 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Box } from '@mui/material';
 import { AuthProvider } from './contexts/AuthContext';
-import Navbar from './components/Navbar';
+import Navbar from './components/Navbar
 import AIChatWidget from './components/AIChatWidget';
+
+import ProtectedRoute from './components/ProtectedRoute';
 import HomePage from './pages/HomePage';
 import CarsPage from './pages/CarsPage';
 import CarDetailPage from './pages/CarDetailPage';
@@ -40,9 +42,21 @@ function App() {
                 <Route path="/cars" element={<CarsPage />} />
                 <Route path="/cars/:id" element={<CarDetailPage />} />
                 <Route path="/contact/:userId" element={<ContactDetailsPage />} />
-                <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/cars/new" element={<AddCarPage />} />
-                <Route path="/account" element={<AccountPage />} />
+                <Route path="/dashboard" element={
+                  <ProtectedRoute>
+                    <DashboardPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/cars/new" element={
+                  <ProtectedRoute>
+                    <AddCarPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/account" element={
+                  <ProtectedRoute>
+                    <AccountPage />
+                  </ProtectedRoute>
+                } />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
               </Routes>
