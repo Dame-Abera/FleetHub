@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class AiService {
   constructor() {
-    console.log('AI Service initialized with NVIDIA and Hugging Face support');
+    console.log('AI Service initialized with NVIDIA support');
   }
 
   async generateCarDescription(make: string, model: string, year: number, features: string[]): Promise<string> {
@@ -120,21 +120,15 @@ export class AiService {
     }
   }
 
-  // Enhanced chatbot with multiple AI providers
+  // Enhanced chatbot with NVIDIA AI provider
   async enhancedChatbot(message: string, context?: any): Promise<string> {
     // Try NVIDIA first (fast and reliable)
     try {
       return await this.nvidiaChat(message, context);
     } catch (error) {
-      console.warn('NVIDIA failed, trying Hugging Face:', error);
-      // Try Hugging Face as fallback
-    try {
-      return await this.huggingFaceChat(message, context);
-      } catch (hfError) {
-        console.warn('Hugging Face also failed, using intelligent fallback:', hfError);
-        // Fallback to intelligent rule-based responses
+      console.warn('NVIDIA failed, using intelligent fallback:', error);
+      // Fallback to intelligent rule-based responses
       return this.fallbackChatbot(message, context);
-      }
     }
   }
 
@@ -189,80 +183,6 @@ export class AiService {
     }
   }
 
-  private async huggingFaceChat(message: string, context?: any): Promise<string> {
-    const apiKey = process.env.HUGGING_FACE_API_KEY;
-    
-    if (!apiKey) {
-      throw new Error('Hugging Face API key not configured');
-    }
-
-    // First, let's test if the API key works with a simple model
-    console.log('Testing Hugging Face API key...');
-    console.log('API Key present:', !!apiKey);
-    console.log('API Key length:', apiKey ? apiKey.length : 0);
-
-    // Try multiple models in order of preference - using models that are known to work with Inference API
-    const models = [
-      "gpt2",                            // Simple GPT-2 model
-      "openai-community/gpt2",           // Full path to GPT-2
-      "distilgpt2",                      // Smaller GPT-2
-      "distilbert/distilgpt2",           // Full path to DistilGPT-2
-      "microsoft/DialoGPT-small",        // Conversational model
-      "facebook/blenderbot-400M-distill" // Another conversational option
-    ];
-
-    for (const model of models) {
-      try {
-        console.log(`Trying Hugging Face model: ${model}`);
-    
-    const response = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        inputs: message,
-        parameters: {
-              max_length: 60,
-          temperature: 0.7,
-          do_sample: true,
-              return_full_text: false,
-        }
-      })
-    });
-
-        console.log(`Response status for ${model}: ${response.status}`);
-
-    if (!response.ok) {
-          const errorText = await response.text();
-          console.error(`Model ${model} failed: ${response.status} - ${errorText}`);
-          continue;
-    }
-
-    const data = await response.json();
-    
-    if (Array.isArray(data) && data.length > 0) {
-          const generatedText = data[0].generated_text;
-          if (generatedText && generatedText.trim().length > 0) {
-            // Clean up the response and make it more conversational
-            const cleanResponse = generatedText.replace(message, '').trim();
-            if (cleanResponse.length > 0) {
-              console.log(`Successfully used model: ${model}`);
-              return cleanResponse;
-            }
-          }
-        }
-      } catch (error) {
-        console.warn(`Model ${model} failed with error:`, error);
-        continue; // Try next model
-      }
-    }
-    
-    // If all models fail, use fallback
-    console.log('All Hugging Face models failed, using fallback');
-    return this.fallbackChatbot(message, context);
-  }
 
   private fallbackChatbot(message: string, context?: any): string {
     const lowerMessage = message.toLowerCase();

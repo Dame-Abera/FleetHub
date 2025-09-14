@@ -16,18 +16,6 @@
 4. Create new key
 5. Copy the key (starts with nvapi-)
 
-### 🥈 **Hugging Face (Alternative)**
-- **Free tier**: 30,000 requests/month
-- **Global access**: ✅ Yes
-- **Setup**: Very easy
-- **Models**: DialoGPT, Llama, Mistral
-
-**How to get API key:**
-1. Go to [huggingface.co](https://huggingface.co)
-2. Create free account
-3. Go to Settings → Access Tokens
-4. Create new token
-5. Copy the token
 
 
 ## 🔧 Environment Setup
@@ -35,9 +23,8 @@
 Add to your `.env` file in the Backend folder:
 
 ```bash
-# Choose one or more AI providers (NVIDIA recommended)
+# NVIDIA AI Provider
 NVIDIA_API_KEY="your-nvidia-api-key-here"
-HUGGING_FACE_API_KEY="your-hugging-face-api-key-here"
 ```
 
 ## 🚀 Features Included
@@ -61,7 +48,7 @@ The chatbot can help users with:
 
 ## 🔄 Fallback System
 
-If AI providers are unavailable, the chatbot uses intelligent rule-based responses that still provide helpful information about your FleetHub platform.
+If NVIDIA API is unavailable, the chatbot uses intelligent rule-based responses that still provide helpful information about your FleetHub platform.
 
 ## 📱 Usage
 
@@ -82,4 +69,4 @@ You can easily customize:
 
 ## 🌍 Global Accessibility
 
-All recommended providers have global CDNs and work worldwide without restrictions.
+NVIDIA API has global CDN and works worldwide without restrictions.
