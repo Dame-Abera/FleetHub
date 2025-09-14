@@ -94,16 +94,16 @@ export class AiController {
         status: 'success', 
         message: 'AI service is working',
         response: response,
-        hasApiKey: !!process.env.HUGGING_FACE_API_KEY,
-        apiKeyLength: process.env.HUGGING_FACE_API_KEY ? process.env.HUGGING_FACE_API_KEY.length : 0
+        hasNvidiaKey: !!process.env.NVIDIA_API_KEY,
+        hasHuggingFaceKey: !!process.env.HUGGING_FACE_API_KEY
       };
     } catch (error) {
       return { 
         status: 'error', 
         message: 'AI service test failed',
         error: error.message,
-        hasApiKey: !!process.env.HUGGING_FACE_API_KEY,
-        apiKeyLength: process.env.HUGGING_FACE_API_KEY ? process.env.HUGGING_FACE_API_KEY.length : 0
+        hasNvidiaKey: !!process.env.NVIDIA_API_KEY,
+        hasHuggingFaceKey: !!process.env.HUGGING_FACE_API_KEY
       };
     }
   }

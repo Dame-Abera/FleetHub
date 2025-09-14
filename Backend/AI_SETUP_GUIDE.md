@@ -29,30 +29,6 @@
 4. Create new token
 5. Copy the token
 
-### 🥈 **Groq (Fast Alternative)**
-- **Free tier**: 14,400 requests/day
-- **Global access**: ✅ Yes
-- **Speed**: Very fast
-- **Models**: Llama 3.1, Mixtral
-
-**How to get API key:**
-1. Go to [console.groq.com](https://console.groq.com)
-2. Create free account
-3. Go to API Keys section
-4. Create new key
-5. Copy the key
-
-### 🥉 **Together AI (Good Alternative)**
-- **Free tier**: $5 credit monthly
-- **Global access**: ✅ Yes
-- **Models**: Llama, Mistral, Qwen
-
-**How to get API key:**
-1. Go to [together.ai](https://together.ai)
-2. Create free account
-3. Go to API Keys
-4. Create new key
-5. Copy the key
 
 ## 🔧 Environment Setup
 
@@ -62,8 +38,6 @@ Add to your `.env` file in the Backend folder:
 # Choose one or more AI providers (NVIDIA recommended)
 NVIDIA_API_KEY="your-nvidia-api-key-here"
 HUGGING_FACE_API_KEY="your-hugging-face-api-key-here"
-GROQ_API_KEY="your-groq-api-key-here"
-TOGETHER_API_KEY="your-together-api-key-here"
 ```
 
 ## 🚀 Features Included
