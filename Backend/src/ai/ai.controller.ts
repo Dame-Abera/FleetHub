@@ -108,6 +108,70 @@ export class AiController {
     }
   }
 
+  @Get('test-nvidia')
+  @ApiOperation({ summary: 'Test NVIDIA API directly' })
+  async testNvidia() {
+    const apiKey = process.env.NVIDIA_API_KEY;
+    
+    if (!apiKey) {
+      return { 
+        status: 'error', 
+        message: 'No NVIDIA API key found',
+        hasApiKey: false
+      };
+    }
+
+    try {
+      const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'meta/llama-4-maverick-17b-128e-instruct',
+          messages: [
+            {
+              role: 'user',
+              content: 'Hello, test message'
+            }
+          ],
+          max_tokens: 50,
+          temperature: 0.7,
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return {
+          status: 'success',
+          message: 'NVIDIA API is working',
+          statusCode: response.status,
+          hasApiKey: true,
+          apiKeyLength: apiKey.length,
+          response: data.choices?.[0]?.message?.content || 'No content',
+          model: data.model || 'meta/llama-4-maverick-17b-128e-instruct'
+        };
+      } else {
+        return {
+          status: 'error',
+          message: 'NVIDIA API failed',
+          statusCode: response.status,
+          hasApiKey: true,
+          apiKeyLength: apiKey.length
+        };
+      }
+    } catch (error) {
+      return {
+        status: 'error',
+        message: 'NVIDIA API test failed',
+        error: error.message,
+        hasApiKey: true,
+        apiKeyLength: apiKey.length
+      };
+    }
+  }
+
   @Get('test-hf')
   @ApiOperation({ summary: 'Test Hugging Face API directly' })
   async testHuggingFace() {
@@ -121,63 +185,68 @@ export class AiController {
       };
     }
 
-    try {
-      // Test with multiple model endpoints to find one that works
-      const testModels = [
-        'gpt2',
-        'openai-community/gpt2',
-        'distilgpt2',
-        'distilbert/distilgpt2',
-        'microsoft/DialoGPT-small'
-      ];
-
-      for (const model of testModels) {
-        console.log(`Testing model: ${model}`);
-        
-        const response = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            inputs: "Hello",
-            parameters: {
-              max_length: 20,
-              return_full_text: false,
-            }
-          })
-        });
-
-        console.log(`Model ${model} status: ${response.status}`);
-
-        if (response.ok) {
-          const data = await response.json();
-          return {
-            status: 'success',
-            message: `Hugging Face API is working with model: ${model}`,
-            workingModel: model,
-            statusCode: response.status,
-            hasApiKey: true,
-            apiKeyLength: apiKey.length,
-            response: data
-          };
-        }
-      }
-
-      // If no model worked, return the error
+    // Check if API key format is correct (should start with hf_)
+    if (!apiKey.startsWith('hf_')) {
       return {
         status: 'error',
-        message: 'All Hugging Face models failed - API might be down or models unavailable',
-        statusCode: 404,
+        message: 'Invalid API key format - should start with "hf_"',
         hasApiKey: true,
         apiKeyLength: apiKey.length,
-        testedModels: testModels
+        apiKeyPrefix: apiKey.substring(0, 10) + '...'
       };
+    }
+
+    try {
+      // Test with a simple, known working model first
+      console.log('Testing Hugging Face API with gpt2...');
+      
+      const response = await fetch('https://api-inference.huggingface.co/models/gpt2', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          inputs: "Hello world",
+          parameters: {
+            max_length: 20,
+            return_full_text: false,
+          }
+        })
+      });
+
+      console.log(`Response status: ${response.status}`);
+      console.log(`Response headers:`, Object.fromEntries(response.headers.entries()));
+
+      if (response.ok) {
+        const data = await response.json();
+        return {
+          status: 'success',
+          message: 'Hugging Face API is working!',
+          workingModel: 'gpt2',
+          statusCode: response.status,
+          hasApiKey: true,
+          apiKeyLength: apiKey.length,
+          response: data
+        };
+      } else {
+        const errorText = await response.text();
+        console.error(`API Error: ${response.status} - ${errorText}`);
+        
+        return {
+          status: 'error',
+          message: `Hugging Face API failed with status ${response.status}`,
+          error: errorText,
+          statusCode: response.status,
+          hasApiKey: true,
+          apiKeyLength: apiKey.length
+        };
+      }
     } catch (error) {
+      console.error('Network error:', error);
       return {
         status: 'error',
-        message: 'Hugging Face API test failed',
+        message: 'Network error connecting to Hugging Face API',
         error: error.message,
         hasApiKey: true,
         apiKeyLength: apiKey.length

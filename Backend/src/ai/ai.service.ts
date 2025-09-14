@@ -188,13 +188,70 @@ export class AiService {
 
   // Enhanced chatbot with multiple AI providers
   async enhancedChatbot(message: string, context?: any): Promise<string> {
-    // Try Hugging Face first (most reliable)
+    // Try NVIDIA first (fast and reliable)
+    try {
+      return await this.nvidiaChat(message, context);
+    } catch (error) {
+      console.warn('NVIDIA failed, trying Hugging Face:', error);
+      // Try Hugging Face as fallback
     try {
       return await this.huggingFaceChat(message, context);
-    } catch (error) {
-      console.warn('Hugging Face failed, trying fallback:', error);
-      // Fallback to simple rule-based responses
+      } catch (hfError) {
+        console.warn('Hugging Face also failed, using intelligent fallback:', hfError);
+        // Fallback to intelligent rule-based responses
       return this.fallbackChatbot(message, context);
+      }
+    }
+  }
+
+  private async nvidiaChat(message: string, context?: any): Promise<string> {
+    const apiKey =process.env.NVIDIA_API_KEY;
+    
+    if (!apiKey) {
+      throw new Error('NVIDIA API key not configured');
+    }
+
+    try {
+      const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'meta/llama-4-maverick-17b-128e-instruct',
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a helpful car marketplace assistant for FleetHub. Help users with questions about cars, rentals, purchases, and general automotive advice. Be friendly, informative, and concise. Keep responses under 150 words.'
+            },
+            {
+              role: 'user',
+              content: message
+            }
+          ],
+          max_tokens: 150,
+          temperature: 0.7,
+          top_p: 1.0,
+          frequency_penalty: 0.0,
+          presence_penalty: 0.0,
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`NVIDIA API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.choices && data.choices.length > 0) {
+        return data.choices[0].message.content.trim();
+      }
+      
+      throw new Error('No response from NVIDIA API');
+    } catch (error) {
+      console.error('NVIDIA API error:', error);
+      throw error;
     }
   }
 
@@ -223,35 +280,35 @@ export class AiService {
     for (const model of models) {
       try {
         console.log(`Trying Hugging Face model: ${model}`);
-        
-        const response = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            inputs: message,
-            parameters: {
+    
+    const response = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        inputs: message,
+        parameters: {
               max_length: 60,
-              temperature: 0.7,
-              do_sample: true,
+          temperature: 0.7,
+          do_sample: true,
               return_full_text: false,
-            }
-          })
-        });
+        }
+      })
+    });
 
         console.log(`Response status for ${model}: ${response.status}`);
-        
-        if (!response.ok) {
+
+    if (!response.ok) {
           const errorText = await response.text();
           console.error(`Model ${model} failed: ${response.status} - ${errorText}`);
           continue;
-        }
+    }
 
-        const data = await response.json();
-        
-        if (Array.isArray(data) && data.length > 0) {
+    const data = await response.json();
+    
+    if (Array.isArray(data) && data.length > 0) {
           const generatedText = data[0].generated_text;
           if (generatedText && generatedText.trim().length > 0) {
             // Clean up the response and make it more conversational
