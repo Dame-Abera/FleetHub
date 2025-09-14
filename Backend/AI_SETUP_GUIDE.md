@@ -2,7 +2,21 @@
 
 ## Free AI Providers for Your FleetHub Chatbot
 
-### 🥇 **Hugging Face (Recommended)**
+### 🥇 **NVIDIA (Recommended)**
+- **Free tier**: Generous free credits
+- **Global access**: ✅ Yes
+- **Speed**: Very fast
+- **Models**: Llama-4-Maverick, Llama-3.1, Mistral
+- **Quality**: Excellent for conversations
+
+**How to get API key:**
+1. Go to [build.nvidia.com](https://build.nvidia.com)
+2. Create free account
+3. Go to API Keys section
+4. Create new key
+5. Copy the key (starts with nvapi-)
+
+### 🥈 **Hugging Face (Alternative)**
 - **Free tier**: 30,000 requests/month
 - **Global access**: ✅ Yes
 - **Setup**: Very easy
@@ -45,7 +59,8 @@
 Add to your `.env` file in the Backend folder:
 
 ```bash
-# Choose one or more AI providers
+# Choose one or more AI providers (NVIDIA recommended)
+NVIDIA_API_KEY="your-nvidia-api-key-here"
 HUGGING_FACE_API_KEY="your-hugging-face-api-key-here"
 GROQ_API_KEY="your-groq-api-key-here"
 TOGETHER_API_KEY="your-together-api-key-here"
