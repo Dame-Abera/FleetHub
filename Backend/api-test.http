@@ -130,4 +130,54 @@ GET {{baseUrl}}/cars?ownerId=owner-user-id
 GET {{baseUrl}}/sales?sellerId=seller-user-id
 
 ### 15. Get Payment History
-GET {{baseUrl}}/payments?transactionType=RENTAL&status=COMPLETED 
+GET {{baseUrl}}/payments?transactionType=RENTAL&status=COMPLETED
+
+### 16. Create Review
+POST {{baseUrl}}/reviews
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "carId": "car-id-here",
+  "revieweeId": "owner-user-id",
+  "rating": 5,
+  "title": "Excellent car!",
+  "comment": "The car was in perfect condition and the owner was very professional."
+}
+
+### 17. Get Reviews for a Car
+GET {{baseUrl}}/reviews/car/car-id-here
+
+### 18. Get Reviews for a User
+GET {{baseUrl}}/reviews/user/user-id-here
+
+### 19. Get User Review Statistics
+GET {{baseUrl}}/reviews/stats/user-id-here
+
+### 20. Get Car Review Statistics
+GET {{baseUrl}}/reviews/car-stats/car-id-here
+
+### 21. Get All Reviews with Filters
+GET {{baseUrl}}/reviews?rating=4&page=1&limit=10
+
+### 22. Update Review
+PUT {{baseUrl}}/reviews/review-id-here
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "rating": 4,
+  "title": "Good car with minor issues",
+  "comment": "Updated review after more consideration."
+}
+
+### 23. Delete Review
+DELETE {{baseUrl}}/reviews/review-id-here
+Authorization: Bearer {{authToken}}
+
+### 24. Verify Review (Admin only)
+POST {{baseUrl}}/reviews/review-id-here/verify
+Authorization: Bearer {{authToken}}
+
+### 25. Get Featured Reviews
+GET {{baseUrl}}/reviews/recent/featured?limit=5 
