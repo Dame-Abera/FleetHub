@@ -6,6 +6,7 @@ import { CarsModule } from './cars/cars.module';
 import { BookingsModule } from './bookings/bookings.module';
 import { SalesModule } from './sales/sales.module';
 import { PaymentsModule } from './payments/payments.module';
+import { ReviewsModule } from './reviews/reviews.module';
 import { AiModule } from './ai/ai.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -22,6 +23,7 @@ import { PrismaModule } from './prisma/prisma.module';
     BookingsModule,
     SalesModule,
     PaymentsModule,
+    ReviewsModule,
     AiModule,
     DashboardModule,
   ],
