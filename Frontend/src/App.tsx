@@ -14,6 +14,7 @@ import AddCarPage from './pages/AddCarPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import AccountPage from './pages/AccountPage';
+import ReviewsPage from './pages/ReviewsPage';
 
 const theme = createTheme({
   palette: {
@@ -43,6 +44,7 @@ function App() {
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/cars/new" element={<AddCarPage />} />
                 <Route path="/account" element={<AccountPage />} />
+                <Route path="/reviews" element={<ReviewsPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
               </Routes>
