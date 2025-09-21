@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
 // Configure axios base URL
-axios.defaults.baseURL = 'http://localhost:3001';
+axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 interface User {
   id: string;
@@ -31,13 +31,6 @@ interface LoginResponse {
   token_type: string;
 }
 
-interface RegisterData {
-  name: string;
-  email: string;
-  password: string;
-  role?: string;
-  phone?: string;
-}
 
 interface UpdateProfileData {
   name?: string;
