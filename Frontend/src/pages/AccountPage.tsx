@@ -35,6 +35,11 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import { format } from 'date-fns';
+import { useQuery } from 'react-query';
+import ReviewCard from '../components/ReviewCard';
+import ReviewStats from '../components/ReviewStats';
+import { reviewService } from '../services/reviewService';
+import StarIcon from '@mui/icons-material/Star';
 
 const AccountPage: React.FC = () => {
   const { user, updateProfile, refreshProfile } = useAuth();
@@ -102,6 +107,30 @@ const AccountPage: React.FC = () => {
       [field]: event.target.value
     }));
   };
+
+  // Fetch user's review statistics
+  const {
+    data: reviewStats,
+    isLoading: statsLoading,
+  } = useQuery(
+    ['user-review-stats', user?.id],
+    () => reviewService.getReviewStats(user!.id),
+    {
+      enabled: !!user?.id,
+    }
+  );
+
+  // Fetch reviews received by user
+  const {
+    data: userReviews,
+    isLoading: reviewsLoading,
+  } = useQuery(
+    ['user-reviews', user?.id],
+    () => reviewService.getReviewsByUser(user!.id),
+    {
+      enabled: !!user?.id,
+    }
+  );
 
   const getRoleColor = (role: string) => {
     switch (role) {
@@ -391,8 +420,67 @@ const AccountPage: React.FC = () => {
             </Card>
           </Slide>
 
-          {/* Account Activity */}
+          {/* Reviews Section */}
           <Slide direction="up" in timeout={1600}>
+            <Card sx={{ mt: 3 }}>
+              <CardContent sx={{ p: 4 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
+                  <StarIcon color="primary" />
+                  <Typography variant="h5" component="h2" sx={{ fontWeight: 600 }}>
+                    Reviews & Ratings
+                  </Typography>
+                </Box>
+
+                {/* Review Stats */}
+                {reviewStats && (
+                  <Box sx={{ mb: 4 }}>
+                    <ReviewStats stats={reviewStats} title="Your Review Statistics" compact={false} />
+                  </Box>
+                )}
+
+                {/* Reviews List */}
+                {reviewsLoading ? (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                    <CircularProgress />
+                  </Box>
+                ) : userReviews && userReviews.length > 0 ? (
+                  <Box>
+                    <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                      Reviews You've Received ({userReviews.length})
+                    </Typography>
+                    {userReviews.slice(0, 5).map((review) => (
+                      <ReviewCard
+                        key={review.id}
+                        review={review}
+                        showCarInfo={true}
+                        showActions={false}
+                      />
+                    ))}
+                    {userReviews.length > 5 && (
+                      <Box sx={{ textAlign: 'center', mt: 2 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          Showing 5 of {userReviews.length} reviews
+                        </Typography>
+                      </Box>
+                    )}
+                  </Box>
+                ) : (
+                  <Box sx={{ textAlign: 'center', py: 4 }}>
+                    <StarIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
+                    <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
+                      No reviews yet
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Reviews from customers will appear here once you start selling cars.
+                    </Typography>
+                  </Box>
+                )}
+              </CardContent>
+            </Card>
+          </Slide>
+
+          {/* Account Activity */}
+          <Slide direction="up" in timeout={1800}>
             <Card sx={{ mt: 3 }}>
               <CardContent sx={{ p: 4 }}>
                 <Typography variant="h5" component="h2" sx={{ fontWeight: 600, mb: 3 }}>
