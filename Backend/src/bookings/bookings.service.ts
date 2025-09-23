@@ -237,7 +237,7 @@ export class BookingsService {
     }
 
     // Check if user has access to this booking
-    if (user.role !== 'ADMIN' && booking.userId !== user.id && booking.car.postedById !== user.id) {
+    if (user.role !== 'ADMIN' && booking.userId !== user.id && booking.car.postedBy.id !== user.id) {
       throw new ForbiddenException('You do not have access to this booking');
     }
 

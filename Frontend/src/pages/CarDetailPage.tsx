@@ -1,14 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Container, Typography, Box, Button, Grid, Card, CardContent, Chip, Divider, CardMedia, Alert, CircularProgress, Stack, Tabs, Tab, Paper } from '@mui/material';
+import { Container, Typography, Box, Button, Grid, Card, CardContent, Chip, Divider, CardMedia, Alert, CircularProgress, Stack, Tabs, Tab, Paper, Snackbar } from '@mui/material';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import StarIcon from '@mui/icons-material/Star';
 import RateReviewIcon from '@mui/icons-material/RateReview';
+import BookOnlineIcon from '@mui/icons-material/BookOnline';
 import ReviewCard from '../components/ReviewCard';
 import ReviewStats from '../components/ReviewStats';
 import ReviewForm from '../components/ReviewForm';
+import BookingForm from '../components/BookingForm';
 import { reviewService } from '../services/reviewService';
 import type { Review, CreateReviewData, UpdateReviewData } from '../services/reviewService';
 import { useAuth } from '../contexts/AuthContext';
@@ -75,6 +77,8 @@ const CarDetailPage: React.FC = () => {
   const [editingReview, setEditingReview] = useState<Review | null>(null);
   const [reviewFormLoading, setReviewFormLoading] = useState(false);
   const [reviewFormError, setReviewFormError] = useState<string | null>(null);
+  const [bookingFormOpen, setBookingFormOpen] = useState(false);
+  const [bookingSuccess, setBookingSuccess] = useState(false);
 
   // Fetch car details
   useEffect(() => {
@@ -85,12 +89,19 @@ const CarDetailPage: React.FC = () => {
         setError(null);
         const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/cars/${id}`);
         if (!response.ok) {
-          throw new Error('Failed to fetch car details');
+          if (response.status === 404) {
+            throw new Error('Car not found');
+          } else if (response.status === 500) {
+            throw new Error('Server error. Please try again later.');
+          } else {
+            throw new Error(`Failed to fetch car details (${response.status})`);
+          }
         }
         const data: Car = await response.json();
         setCar(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        console.error('Error fetching car:', err);
+        setError(err instanceof Error ? err.message : 'An error occurred while loading the car details');
       } finally {
         setLoading(false);
       }
@@ -108,18 +119,24 @@ const CarDetailPage: React.FC = () => {
     ['car-reviews', id],
     () => reviewService.getReviewsByCar(id!),
     {
-      enabled: !!id,
+      enabled: !!id && !!car,
+      retry: 2,
+      retryDelay: 1000,
     }
   );
 
   // Fetch review stats for this car
   const {
     data: reviewStats,
+    isLoading: statsLoading,
+    error: statsError,
   } = useQuery(
     ['car-review-stats', id],
     () => reviewService.getCarReviewStats(id!),
     {
-      enabled: !!id,
+      enabled: !!id && !!car,
+      retry: 2,
+      retryDelay: 1000,
     }
   );
 
@@ -151,7 +168,10 @@ const CarDetailPage: React.FC = () => {
   };
 
   const handleReviewSubmit = async (data: CreateReviewData | UpdateReviewData) => {
-    if (!id || !car?.postedBy?.id) return;
+    if (!id || !car?.postedBy?.id) {
+      setReviewFormError('Missing required information. Please refresh the page and try again.');
+      return;
+    }
 
     setReviewFormLoading(true);
     setReviewFormError(null);
@@ -169,13 +189,32 @@ const CarDetailPage: React.FC = () => {
         });
       }
       
-      refetchReviews();
+      await refetchReviews();
       setReviewFormOpen(false);
     } catch (error: any) {
-      setReviewFormError(error.response?.data?.message || 'Failed to submit review');
+      console.error('Review submission error:', error);
+      setReviewFormError(
+        error.response?.data?.message || 
+        error.message || 
+        'Failed to submit review. Please try again.'
+      );
     } finally {
       setReviewFormLoading(false);
     }
+  };
+
+  const handleBookingSuccess = (booking: any) => {
+    setBookingSuccess(true);
+    console.log('Booking created successfully:', booking);
+  };
+
+  const handleBookingClick = () => {
+    if (!user) {
+      // Redirect to login or show login prompt
+      window.location.href = '/login';
+      return;
+    }
+    setBookingFormOpen(true);
   };
 
   const userReview = reviews?.find(review => review.reviewerId === user?.id);
@@ -192,6 +231,16 @@ const CarDetailPage: React.FC = () => {
     return [];
   }, [car]);
 
+  // Debug information (remove in production)
+  const debugInfo = {
+    carId: id,
+    carLoaded: !!car,
+    userLoggedIn: !!user,
+    reviewsLoaded: !!reviews,
+    reviewsCount: reviews?.length || 0,
+    statsLoaded: !!reviewStats,
+  };
+
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Button
@@ -203,6 +252,15 @@ const CarDetailPage: React.FC = () => {
         Back to Cars
       </Button>
 
+      {/* Debug info - remove in production */}
+      {import.meta.env.DEV && (
+        <Box sx={{ mb: 2, p: 2, bgcolor: 'grey.100', borderRadius: 1, fontSize: '0.8rem' }}>
+          <Typography variant="caption" component="pre">
+            Debug: {JSON.stringify(debugInfo, null, 2)}
+          </Typography>
+        </Box>
+      )}
+
       {loading && (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
           <CircularProgress size={60} />
@@ -210,7 +268,19 @@ const CarDetailPage: React.FC = () => {
       )}
 
       {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
+        <Alert 
+          severity="error" 
+          sx={{ mb: 3 }}
+          action={
+            <Button
+              color="inherit"
+              size="small"
+              onClick={() => window.location.reload()}
+            >
+              Retry
+            </Button>
+          }
+        >
           {error}
         </Alert>
       )}
@@ -317,16 +387,41 @@ const CarDetailPage: React.FC = () => {
                   </Stack>
 
                   <Box sx={{ mt: 3 }}>
-                    <Button
-                      component={Link}
-                      to={`/contact/${car.postedBy?.id}`}
-                      variant="contained"
-                      size="large"
-                      fullWidth
-                      sx={{ py: 1.5 }}
-                    >
-                      Contact Seller
-                    </Button>
+                    <Stack spacing={2}>
+                      {car.availableForRental && car.rentalPricePerDay && (
+                        <Button
+                          variant="contained"
+                          size="large"
+                          fullWidth
+                          sx={{ py: 1.5 }}
+                          startIcon={<BookOnlineIcon />}
+                          onClick={handleBookingClick}
+                          disabled={user?.id === car.postedBy?.id}
+                        >
+                          {user?.id === car.postedBy?.id 
+                            ? "Can't book your own car" 
+                            : "Book This Car"
+                          }
+                        </Button>
+                      )}
+                      
+                      {car.postedBy?.id ? (
+                        <Button
+                          component={Link}
+                          to={`/contact/${car.postedBy.id}`}
+                          variant="outlined"
+                          size="large"
+                          fullWidth
+                          sx={{ py: 1.5 }}
+                        >
+                          Contact Seller
+                        </Button>
+                      ) : (
+                        <Alert severity="warning" sx={{ textAlign: 'center' }}>
+                          Seller information not available
+                        </Alert>
+                      )}
+                    </Stack>
                   </Box>
                 </CardContent>
               </Card>
@@ -366,7 +461,15 @@ const CarDetailPage: React.FC = () => {
 
               <TabPanel value={tabValue} index={0}>
                 {/* Review Stats */}
-                {reviewStats && (
+                {statsLoading ? (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                    <CircularProgress />
+                  </Box>
+                ) : statsError ? (
+                  <Alert severity="warning" sx={{ mb: 3 }}>
+                    Unable to load review statistics. Reviews may still be available below.
+                  </Alert>
+                ) : reviewStats && (
                   <Box sx={{ mb: 4 }}>
                     <ReviewStats stats={reviewStats} title="Car Reviews" />
                   </Box>
@@ -379,7 +482,7 @@ const CarDetailPage: React.FC = () => {
                   </Box>
                 ) : reviewsError ? (
                   <Alert severity="error" sx={{ mb: 3 }}>
-                    Failed to load reviews. Please try again.
+                    Failed to load reviews. Please refresh the page or try again later.
                   </Alert>
                 ) : reviews && reviews.length > 0 ? (
                   <Box>
@@ -474,6 +577,22 @@ const CarDetailPage: React.FC = () => {
             ownerName={car.postedBy?.name}
             loading={reviewFormLoading}
             error={reviewFormError || undefined}
+          />
+
+          {/* Booking Form Dialog */}
+          <BookingForm
+            open={bookingFormOpen}
+            onClose={() => setBookingFormOpen(false)}
+            onSuccess={handleBookingSuccess}
+            car={car}
+          />
+
+          {/* Success Snackbar */}
+          <Snackbar
+            open={bookingSuccess}
+            autoHideDuration={6000}
+            onClose={() => setBookingSuccess(false)}
+            message="Booking created successfully! Check your dashboard for details."
           />
         </>
       )}

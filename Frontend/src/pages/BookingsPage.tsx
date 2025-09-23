@@ -1,0 +1,336 @@
+import React, { useState } from 'react';
+import {
+  Container,
+  Typography,
+  Box,
+  Tabs,
+  Tab,
+  Paper,
+  CircularProgress,
+  Alert,
+  Button,
+  Stack,
+  Chip,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Grid
+} from '@mui/material';
+import {
+  DirectionsCar as DirectionsCarIcon,
+  CalendarToday as CalendarIcon,
+  FilterList as FilterIcon,
+  Refresh as RefreshIcon
+} from '@mui/icons-material';
+import { useQuery } from 'react-query';
+import { useAuth } from '../contexts/AuthContext';
+import BookingCard from '../components/BookingCard';
+import { bookingService, type Booking } from '../services/bookingService';
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`bookings-tabpanel-${index}`}
+      aria-labelledby={`bookings-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
+    </div>
+  );
+}
+
+const BookingsPage: React.FC = () => {
+  const { user } = useAuth();
+  const [tabValue, setTabValue] = useState(0);
+  const [statusFilter, setStatusFilter] = useState<string>('');
+
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+  };
+
+  // Fetch all bookings
+  const {
+    data: allBookings,
+    isLoading: allBookingsLoading,
+    error: allBookingsError,
+    refetch: refetchAllBookings
+  } = useQuery(
+    ['bookings', 'all', statusFilter],
+    () => bookingService.getBookings({ 
+      status: statusFilter || undefined,
+      limit: 50 
+    }),
+    {
+      enabled: !!user,
+      retry: 2,
+      retryDelay: 1000,
+    }
+  );
+
+  // Fetch bookings as renter
+  const {
+    data: renterBookings,
+    isLoading: renterBookingsLoading,
+    error: renterBookingsError,
+    refetch: refetchRenterBookings
+  } = useQuery(
+    ['bookings', 'renter', statusFilter],
+    () => bookingService.getBookings({ 
+      status: statusFilter || undefined,
+      limit: 50 
+    }),
+    {
+      enabled: !!user,
+      retry: 2,
+      retryDelay: 1000,
+    }
+  );
+
+  // Filter bookings based on user role
+  const myBookings = allBookings?.data.filter(booking => booking.userId === user?.id) || [];
+  const ownerBookings = allBookings?.data.filter(booking => booking.car.postedBy.id === user?.id) || [];
+
+  const handleRefresh = () => {
+    refetchAllBookings();
+    refetchRenterBookings();
+  };
+
+  const handleBookingEdit = (booking: Booking) => {
+    // TODO: Implement booking edit functionality
+    console.log('Edit booking:', booking);
+  };
+
+  const handleBookingDelete = async (booking: Booking) => {
+    if (window.confirm('Are you sure you want to cancel this booking?')) {
+      try {
+        await bookingService.deleteBooking(booking.id);
+        handleRefresh();
+      } catch (error) {
+        console.error('Failed to delete booking:', error);
+      }
+    }
+  };
+
+  const handleStatusChange = async (booking: Booking, newStatus: string) => {
+    try {
+      await bookingService.updateBooking(booking.id, { status: newStatus as any });
+      handleRefresh();
+    } catch (error) {
+      console.error('Failed to update booking status:', error);
+    }
+  };
+
+  if (!user) {
+    return (
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Alert severity="warning" sx={{ textAlign: 'center' }}>
+          Please log in to view your bookings.
+        </Alert>
+      </Container>
+    );
+  }
+
+  return (
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+        <Typography variant="h4" component="h1" sx={{ fontWeight: 600 }}>
+          My Bookings
+        </Typography>
+        
+        <Stack direction="row" spacing={2} alignItems="center">
+          <FormControl size="small" sx={{ minWidth: 120 }}>
+            <InputLabel>Status</InputLabel>
+            <Select
+              value={statusFilter}
+              label="Status"
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <MenuItem value="">All</MenuItem>
+              <MenuItem value="PENDING">Pending</MenuItem>
+              <MenuItem value="CONFIRMED">Confirmed</MenuItem>
+              <MenuItem value="CANCELLED">Cancelled</MenuItem>
+            </Select>
+          </FormControl>
+          
+          <Button
+            variant="outlined"
+            startIcon={<RefreshIcon />}
+            onClick={handleRefresh}
+            disabled={allBookingsLoading || renterBookingsLoading}
+          >
+            Refresh
+          </Button>
+        </Stack>
+      </Box>
+
+      <Paper sx={{ borderRadius: 2 }}>
+        <Tabs
+          value={tabValue}
+          onChange={handleTabChange}
+          variant="fullWidth"
+          sx={{
+            '& .MuiTab-root': {
+              fontWeight: 600,
+              textTransform: 'none',
+              fontSize: '1rem',
+            },
+          }}
+        >
+          <Tab
+            icon={<DirectionsCarIcon />}
+            iconPosition="start"
+            label={`My Bookings (${myBookings.length})`}
+            id="bookings-tab-0"
+            aria-controls="bookings-tabpanel-0"
+          />
+          <Tab
+            icon={<CalendarIcon />}
+            iconPosition="start"
+            label={`Car Owner Bookings (${ownerBookings.length})`}
+            id="bookings-tab-1"
+            aria-controls="bookings-tabpanel-1"
+          />
+        </Tabs>
+
+        <TabPanel value={tabValue} index={0}>
+          {/* My Bookings as Renter */}
+          {allBookingsLoading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+              <CircularProgress size={60} />
+            </Box>
+          ) : allBookingsError ? (
+            <Alert 
+              severity="error" 
+              sx={{ mb: 3 }}
+              action={
+                <Button
+                  color="inherit"
+                  size="small"
+                  onClick={handleRefresh}
+                >
+                  Retry
+                </Button>
+              }
+            >
+              Failed to load bookings. Please try again.
+            </Alert>
+          ) : myBookings.length > 0 ? (
+            <Box>
+              <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
+                Your Car Bookings
+              </Typography>
+              {myBookings.map((booking) => (
+                <BookingCard
+                  key={booking.id}
+                  booking={booking}
+                  showActions={true}
+                  onEdit={handleBookingEdit}
+                  onDelete={handleBookingDelete}
+                  onStatusChange={handleStatusChange}
+                  currentUserId={user.id}
+                  isOwner={false}
+                />
+              ))}
+            </Box>
+          ) : (
+            <Box sx={{ textAlign: 'center', py: 8 }}>
+              <DirectionsCarIcon sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
+              <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
+                No bookings found
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                {statusFilter 
+                  ? `No ${statusFilter.toLowerCase()} bookings found.`
+                  : "You haven't made any car bookings yet."
+                }
+              </Typography>
+              <Button
+                variant="contained"
+                href="/cars"
+                size="large"
+              >
+                Browse Cars
+              </Button>
+            </Box>
+          )}
+        </TabPanel>
+
+        <TabPanel value={tabValue} index={1}>
+          {/* Bookings for My Cars */}
+          {allBookingsLoading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+              <CircularProgress size={60} />
+            </Box>
+          ) : allBookingsError ? (
+            <Alert 
+              severity="error" 
+              sx={{ mb: 3 }}
+              action={
+                <Button
+                  color="inherit"
+                  size="small"
+                  onClick={handleRefresh}
+                >
+                  Retry
+                </Button>
+              }
+            >
+              Failed to load bookings. Please try again.
+            </Alert>
+          ) : ownerBookings.length > 0 ? (
+            <Box>
+              <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
+                Bookings for Your Cars
+              </Typography>
+              {ownerBookings.map((booking) => (
+                <BookingCard
+                  key={booking.id}
+                  booking={booking}
+                  showActions={true}
+                  onEdit={handleBookingEdit}
+                  onDelete={handleBookingDelete}
+                  onStatusChange={handleStatusChange}
+                  currentUserId={user.id}
+                  isOwner={true}
+                />
+              ))}
+            </Box>
+          ) : (
+            <Box sx={{ textAlign: 'center', py: 8 }}>
+              <CalendarIcon sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
+              <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
+                No bookings for your cars
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                {statusFilter 
+                  ? `No ${statusFilter.toLowerCase()} bookings found for your cars.`
+                  : "No one has booked your cars yet."
+                }
+              </Typography>
+              <Button
+                variant="contained"
+                href="/cars/new"
+                size="large"
+              >
+                Add a Car
+              </Button>
+            </Box>
+          )}
+        </TabPanel>
+      </Paper>
+    </Container>
+  );
+};
+
+export default BookingsPage;
+

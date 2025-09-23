@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Box } from '@mui/material';
+import { QueryClient, QueryClientProvider } from 'react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
 
@@ -15,6 +16,7 @@ import CarDetailPage from './pages/CarDetailPage';
 import ContactDetailsPage from './pages/ContactDetailsPage';
 import DashboardPage from './pages/DashboardPage';
 import AddCarPage from './pages/AddCarPage';
+import BookingsPage from './pages/BookingsPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import AccountPage from './pages/AccountPage';
@@ -30,12 +32,23 @@ const theme = createTheme({
   },
 });
 
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <AuthProvider>
-        <Router>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <AuthProvider>
+          <Router>
           <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
             <Navbar />
             <Box component="main" sx={{ flexGrow: 1 }}>
@@ -54,6 +67,11 @@ function App() {
                     <AddCarPage />
                   </ProtectedRoute>
                 } />
+                <Route path="/bookings" element={
+                  <ProtectedRoute>
+                    <BookingsPage />
+                  </ProtectedRoute>
+                } />
                 <Route path="/account" element={
                   <ProtectedRoute>
                     <AccountPage />
@@ -69,6 +87,7 @@ function App() {
         </Router>
       </AuthProvider>
     </ThemeProvider>
+    </QueryClientProvider>
   );
 }
 

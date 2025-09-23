@@ -35,6 +35,7 @@ import StarIcon from '@mui/icons-material/Star';
 import LoginIcon from '@mui/icons-material/Login';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import LogoutIcon from '@mui/icons-material/Logout';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import PersonIcon from '@mui/icons-material/Person';
 
@@ -111,6 +112,7 @@ const Navbar: React.FC = () => {
   const authItems = user
     ? [
         { label: 'Dashboard', href: '/dashboard', icon: <DashboardIcon /> },
+        { label: 'My Bookings', href: '/bookings', icon: <CalendarTodayIcon /> },
         { label: 'Account', href: '/account', icon: <PersonAddIcon /> },
         { label: 'Logout', action: handleLogout, icon: <LogoutIcon /> }
       ]
