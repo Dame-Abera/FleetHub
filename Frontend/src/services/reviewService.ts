@@ -69,10 +69,15 @@ export interface ReviewsResponse {
 class ReviewService {
   private getAuthHeaders() {
     const token = localStorage.getItem('token');
-    return {
-      'Authorization': `Bearer ${token}`,
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    return headers;
   }
 
   async createReview(data: CreateReviewData): Promise<Review> {
@@ -106,10 +111,15 @@ class ReviewService {
   }
 
   async getReviewsByCar(carId: string): Promise<Review[]> {
-    const response = await axios.get(`${API_BASE_URL}/reviews/car/${carId}`, {
-      headers: this.getAuthHeaders(),
-    });
-    return response.data;
+    try {
+      const response = await axios.get(`${API_BASE_URL}/reviews/car/${carId}`, {
+        headers: this.getAuthHeaders(),
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching reviews by car:', error);
+      throw error;
+    }
   }
 
   async getReviewsByUser(userId: string): Promise<Review[]> {
@@ -127,10 +137,15 @@ class ReviewService {
   }
 
   async getCarReviewStats(carId: string): Promise<ReviewStats> {
-    const response = await axios.get(`${API_BASE_URL}/reviews/car-stats/${carId}`, {
-      headers: this.getAuthHeaders(),
-    });
-    return response.data;
+    try {
+      const response = await axios.get(`${API_BASE_URL}/reviews/car-stats/${carId}`, {
+        headers: this.getAuthHeaders(),
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching car review stats:', error);
+      throw error;
+    }
   }
 
   async getReview(id: string): Promise<Review> {
