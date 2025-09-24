@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+
 import { Container, Typography, Box, Button, Grid, Card, CardContent, Chip, Divider, CardMedia, Alert, CircularProgress, Stack, Tabs, Tab, Paper, Snackbar } from '@mui/material';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from 'react-query';
@@ -6,11 +7,14 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import StarIcon from '@mui/icons-material/Star';
 import RateReviewIcon from '@mui/icons-material/RateReview';
+
+
 import BookOnlineIcon from '@mui/icons-material/BookOnline';
 import ReviewCard from '../components/ReviewCard';
 import ReviewStats from '../components/ReviewStats';
 import ReviewForm from '../components/ReviewForm';
 import BookingForm from '../components/BookingForm';
+
 import { reviewService } from '../services/reviewService';
 import type { Review, CreateReviewData, UpdateReviewData } from '../services/reviewService';
 import { useAuth } from '../contexts/AuthContext';
@@ -216,7 +220,6 @@ const CarDetailPage: React.FC = () => {
     }
     setBookingFormOpen(true);
   };
-
   const userReview = reviews?.find(review => review.reviewerId === user?.id);
 
   const featureList: string[] = useMemo(() => {
