@@ -84,4 +84,92 @@ export class AiController {
     const analysis = await this.aiService.analyzeMarketTrends(sampleData);
     return { analysis };
   }
+
+  @Get('test')
+  @ApiOperation({ summary: 'Test AI service connection' })
+  async testAiService() {
+    try {
+      const response = await this.aiService.enhancedChatbot("Hello, test message");
+      return { 
+        status: 'success', 
+        message: 'AI service is working',
+        response: response,
+        hasNvidiaKey: !!process.env.NVIDIA_API_KEY,
+        provider: process.env.NVIDIA_API_KEY ? 'NVIDIA' : 'Fallback'
+      };
+    } catch (error) {
+      return { 
+        status: 'error', 
+        message: 'AI service test failed',
+        error: error.message,
+        hasNvidiaKey: !!process.env.NVIDIA_API_KEY,
+        provider: 'Fallback'
+      };
+    }
+  }
+
+  @Get('test-nvidia')
+  @ApiOperation({ summary: 'Test NVIDIA API directly' })
+  async testNvidia() {
+    const apiKey = process.env.NVIDIA_API_KEY;
+    
+    if (!apiKey) {
+      return { 
+        status: 'error', 
+        message: 'No NVIDIA API key found',
+        hasApiKey: false
+      };
+    }
+
+    try {
+      const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'meta/llama-4-maverick-17b-128e-instruct',
+          messages: [
+            {
+              role: 'user',
+              content: 'Hello, test message'
+            }
+          ],
+          max_tokens: 50,
+          temperature: 0.7,
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return {
+          status: 'success',
+          message: 'NVIDIA API is working',
+          statusCode: response.status,
+          hasApiKey: true,
+          apiKeyLength: apiKey.length,
+          response: data.choices?.[0]?.message?.content || 'No content',
+          model: data.model || 'meta/llama-4-maverick-17b-128e-instruct'
+        };
+      } else {
+        return {
+          status: 'error',
+          message: 'NVIDIA API failed',
+          statusCode: response.status,
+          hasApiKey: true,
+          apiKeyLength: apiKey.length
+        };
+      }
+    } catch (error) {
+      return {
+        status: 'error',
+        message: 'NVIDIA API test failed',
+        error: error.message,
+        hasApiKey: true,
+        apiKeyLength: apiKey.length
+      };
+    }
+  }
+
 }
