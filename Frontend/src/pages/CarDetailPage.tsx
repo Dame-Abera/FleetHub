@@ -255,14 +255,7 @@ const CarDetailPage: React.FC = () => {
         Back to Cars
       </Button>
 
-      {/* Debug info - remove in production */}
-      {import.meta.env.DEV && (
-        <Box sx={{ mb: 2, p: 2, bgcolor: 'grey.100', borderRadius: 1, fontSize: '0.8rem' }}>
-          <Typography variant="caption" component="pre">
-            Debug: {JSON.stringify(debugInfo, null, 2)}
-          </Typography>
-        </Box>
-      )}
+      
 
       {loading && (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
