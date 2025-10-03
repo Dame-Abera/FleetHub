@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Controller, Get } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
@@ -10,6 +10,14 @@ import { ReviewsModule } from './reviews/reviews.module';
 import { AiModule } from './ai/ai.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { PrismaModule } from './prisma/prisma.module';
+
+@Controller()
+export class HealthController {
+  @Get('health')
+  health() {
+    return { status: 'ok', timestamp: new Date().toISOString() };
+  }
+}
 
 @Module({
   imports: [
@@ -27,5 +35,6 @@ import { PrismaModule } from './prisma/prisma.module';
     AiModule,
     DashboardModule,
   ],
+  controllers: [HealthController],
 })
 export class AppModule {}
