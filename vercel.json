@@ -2,6 +2,9 @@
   "buildCommand": "yarn build",
   "outputDirectory": "dist",
   "framework": "vite",
+  "env": {
+    "VITE_API_URL": "https://fleethub-backend.onrender.com"
+  },
   "rewrites": [
     {
       "source": "/(.*)",

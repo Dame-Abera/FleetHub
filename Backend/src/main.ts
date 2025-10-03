@@ -18,7 +18,9 @@ async function bootstrap() {
     origin: [
       'http://localhost:3000', 
       'http://localhost:5173',
-      process.env.FRONTEND_URL || 'https://your-frontend-url.vercel.app'
+      'https://fleethubet.vercel.app',
+      'https://frontend-a2vfp59n6-dame-aberas-projects.vercel.app',
+      process.env.FRONTEND_URL || 'https://fleethubet.vercel.app'
     ],
     credentials: true,
   });
