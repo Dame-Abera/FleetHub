@@ -37,7 +37,7 @@ const ContactDetailsPage: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch(`http://localhost:3001/users/${userId}`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/users/${userId}`);
         if (!response.ok) {
           throw new Error('Failed to fetch user details');
         }

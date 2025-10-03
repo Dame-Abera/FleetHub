@@ -15,7 +15,11 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
   
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://localhost:5173'],
+    origin: [
+      'http://localhost:3000', 
+      'http://localhost:5173',
+      process.env.FRONTEND_URL || 'https://your-frontend-url.vercel.app'
+    ],
     credentials: true,
   });
   
@@ -48,8 +52,9 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(3001);
-  console.log('🚗 Car Marketplace API running on http://localhost:3001');
-  console.log('📚 API Documentation: http://localhost:3001/api');
+  const port = process.env.PORT || 3001;
+  await app.listen(port);
+  console.log(`🚗 Car Marketplace API running on port ${port}`);
+  console.log(`📚 API Documentation: http://localhost:${port}/api`);
 }
 bootstrap();

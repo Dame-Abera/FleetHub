@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Typography, Box, TextField, Button, Card, CardContent, Link as MuiLink } from '@mui/material';
+import { Container, Typography, Box, TextField, Button, Card, CardContent, Link as MuiLink, Alert, CircularProgress } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -11,6 +11,8 @@ const RegisterPage: React.FC = () => {
     password: '',
     confirmPassword: ''
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const { register } = useAuth();
   const navigate = useNavigate();
 
@@ -23,15 +25,29 @@ const RegisterPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    setLoading(true);
+    
     if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match');
+      setError('Passwords do not match');
+      setLoading(false);
       return;
     }
+    
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      setLoading(false);
+      return;
+    }
+    
     try {
       await register(formData.email, formData.password, formData.firstName, formData.lastName);
       navigate('/dashboard');
-    } catch (error) {
+    } catch (error: any) {
+      setError(error.message || 'Registration failed. Please try again.');
       console.error('Registration failed:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -47,6 +63,13 @@ const RegisterPage: React.FC = () => {
               Create your account to get started
             </Typography>
           </Box>
+
+          {/* Error Alert */}
+          {error && (
+            <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
+              {error}
+            </Alert>
+          )}
 
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
@@ -114,9 +137,26 @@ const RegisterPage: React.FC = () => {
               fullWidth
               variant="contained"
               size="large"
-              sx={{ py: 1.5, mb: 2 }}
+              disabled={loading}
+              sx={{ 
+                py: 1.5, 
+                mb: 2,
+                borderRadius: 2,
+                fontSize: '1.1rem',
+                fontWeight: 600,
+                '&:disabled': {
+                  opacity: 0.7,
+                },
+              }}
             >
-              Create Account
+              {loading ? (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <CircularProgress size={20} color="inherit" />
+                  Creating Account...
+                </Box>
+              ) : (
+                'Create Account'
+              )}
             </Button>
             <Box sx={{ textAlign: 'center' }}>
               <Typography variant="body2">

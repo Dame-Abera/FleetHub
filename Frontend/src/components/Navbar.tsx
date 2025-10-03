@@ -15,7 +15,6 @@ import {
   ListItemIcon,
   ListItemText,
   Breadcrumbs,
-  Chip,
   useTheme,
   useMediaQuery,
   Divider,
@@ -32,9 +31,11 @@ import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import DirectionsCarOutlinedIcon from '@mui/icons-material/DirectionsCarOutlined';
+import StarIcon from '@mui/icons-material/Star';
 import LoginIcon from '@mui/icons-material/Login';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import LogoutIcon from '@mui/icons-material/Logout';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import PersonIcon from '@mui/icons-material/Person';
 
@@ -83,6 +84,8 @@ const Navbar: React.FC = () => {
         { label: 'Browse Cars', href: '/cars', icon: <DirectionsCarOutlinedIcon /> },
         { label: 'Car Details', href: path, icon: <DirectionsCarIcon /> }
       );
+    } else if (path === '/reviews') {
+      breadcrumbs.push({ label: 'Reviews', href: '/reviews', icon: <StarIcon /> });
     } else if (path === '/dashboard') {
       breadcrumbs.push({ label: 'Dashboard', href: '/dashboard', icon: <DashboardIcon /> });
     } else if (path === '/login') {
@@ -103,11 +106,13 @@ const Navbar: React.FC = () => {
   const navigationItems = [
     { label: 'Home', href: '/', icon: <HomeIcon /> },
     { label: 'Browse Cars', href: '/cars', icon: <DirectionsCarOutlinedIcon /> },
+    { label: 'Reviews', href: '/reviews', icon: <StarIcon /> },
   ];
 
   const authItems = user
     ? [
         { label: 'Dashboard', href: '/dashboard', icon: <DashboardIcon /> },
+        { label: 'My Bookings', href: '/bookings', icon: <CalendarTodayIcon /> },
         { label: 'Account', href: '/account', icon: <PersonAddIcon /> },
         { label: 'Logout', action: handleLogout, icon: <LogoutIcon /> }
       ]
@@ -387,6 +392,27 @@ const Navbar: React.FC = () => {
                 }}
               >
                 Browse Cars
+              </Button>
+
+              <Button 
+                component={Link} 
+                to="/reviews"
+                startIcon={<StarIcon />}
+                sx={{
+                  color: 'white',
+                  fontWeight: 500,
+                  px: 2,
+                  py: 1,
+                  borderRadius: 2,
+                  backgroundColor: isActive('/reviews') ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                    transform: 'translateY(-1px)',
+                    transition: 'all 0.2s ease'
+                  }
+                }}
+              >
+                Reviews
               </Button>
             </>
           )}

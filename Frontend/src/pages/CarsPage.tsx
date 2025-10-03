@@ -106,7 +106,7 @@ const CarsPage: React.FC = () => {
         params.append('brand', searchTerm);
       }
       
-      const response = await fetch(`http://localhost:3001/cars?${params.toString()}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/cars?${params.toString()}`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch cars');
