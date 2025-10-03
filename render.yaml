@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: fleethub-backend
+    env: node
+    plan: free
+    buildCommand: cd Backend && yarn install && yarn build
+    startCommand: cd Backend && yarn start:prod
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: FRONTEND_URL
+        value: https://your-frontend-url.vercel.app
+    healthCheckPath: /health
+
+databases:
+  - name: fleethub-db
+    plan: free
