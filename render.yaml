@@ -3,7 +3,7 @@ services:
     name: fleethub-backend
     env: node
     plan: free
-    buildCommand: cd Backend && yarn install && yarn prisma generate && yarn build
+    buildCommand: cd Backend && yarn install --production=false && yarn prisma generate && yarn build
     startCommand: cd Backend && yarn start:prod
     envVars:
       - key: NODE_ENV
