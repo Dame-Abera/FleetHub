@@ -48,6 +48,10 @@ const BookingForm: React.FC<BookingFormProps> = ({ open, onClose, onSuccess, car
   const [error, setError] = useState<string | null>(null);
   const [totalPrice, setTotalPrice] = useState(0);
 
+  // Debug logging
+  console.log('BookingForm car data:', car);
+  console.log('rentalPricePerDay:', car?.rentalPricePerDay, 'type:', typeof car?.rentalPricePerDay);
+
   // Reset form when dialog opens/closes
   useEffect(() => {
     if (open) {
@@ -129,6 +133,11 @@ const BookingForm: React.FC<BookingFormProps> = ({ open, onClose, onSuccess, car
     ? Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24))
     : 0;
 
+  // Safety check - don't render if car data is invalid
+  if (!car || !car.id) {
+    return null;
+  }
+
   return (
     <Dialog 
       open={open} 
@@ -179,7 +188,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ open, onClose, onSuccess, car
                       Daily Rate
                     </Typography>
                     <Typography variant="h6" color="primary">
-                      ${car.rentalPricePerDay?.toFixed(2) || '0.00'}/day
+                      ${typeof car.rentalPricePerDay === 'number' ? car.rentalPricePerDay.toFixed(2) : '0.00'}/day
                     </Typography>
                     
                     {car.postedBy && (
@@ -259,7 +268,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ open, onClose, onSuccess, car
                     <Stack spacing={1}>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                         <Typography variant="body2">
-                          {days} day{days !== 1 ? 's' : ''} × ${car.rentalPricePerDay?.toFixed(2)}
+                          {days} day{days !== 1 ? 's' : ''} × ${typeof car.rentalPricePerDay === 'number' ? car.rentalPricePerDay.toFixed(2) : '0.00'}
                         </Typography>
                         <Typography variant="body2">
                           ${(car.rentalPricePerDay || 0) * days}

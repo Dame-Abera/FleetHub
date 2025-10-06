@@ -101,7 +101,20 @@ export class CarsController {
   @Get()
   @ApiOperation({ summary: 'Get all cars with optional filters' })
   findAll(@Query() searchDto: SearchCarsDto) {
+    this.logger.log(`Fetching cars with filters: ${JSON.stringify(searchDto)}`);
     return this.carsService.findAll(searchDto);
+  }
+
+  @Get('debug/count')
+  @ApiOperation({ summary: 'Get total car count for debugging' })
+  async getCarCount() {
+    const total = await this.carsService.getTotalCount();
+    const approved = await this.carsService.getApprovedCount();
+    return {
+      total,
+      approved,
+      message: `Total cars: ${total}, Approved cars: ${approved}`
+    };
   }
 
   @Get(':id')

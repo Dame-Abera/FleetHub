@@ -76,7 +76,10 @@ export class CarsService {
       limit = 20
     } = searchDto;
 
-    const where: any = {};
+    const where: any = {
+      // Only show approved cars to public
+      status: 'APPROVED'
+    };
 
     if (category) where.category = category;
     if (brand) where.brand = { contains: brand, mode: 'insensitive' };
@@ -183,6 +186,16 @@ export class CarsService {
 
     return this.prisma.car.delete({
       where: { id }
+    });
+  }
+
+  async getTotalCount() {
+    return this.prisma.car.count();
+  }
+
+  async getApprovedCount() {
+    return this.prisma.car.count({
+      where: { status: 'APPROVED' }
     });
   }
 }

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { Container, Typography, Box, Button, Grid, Card, CardContent, Chip, Divider, CardMedia, Alert, CircularProgress, Stack, Tabs, Tab, Paper, Snackbar } from '@mui/material';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -73,6 +73,7 @@ function TabPanel(props: TabPanelProps) {
 const CarDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [car, setCar] = useState<Car | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -102,7 +103,20 @@ const CarDetailPage: React.FC = () => {
           }
         }
         const data: Car = await response.json();
-        setCar(data);
+        console.log('Car data received:', data);
+        console.log('rentalPricePerDay type:', typeof data.rentalPricePerDay, 'value:', data.rentalPricePerDay);
+        
+        // Ensure numeric fields are properly converted
+        const processedData: Car = {
+          ...data,
+          rentalPricePerDay: data.rentalPricePerDay ? Number(data.rentalPricePerDay) : undefined,
+          salePrice: data.salePrice ? Number(data.salePrice) : undefined,
+          mileage: data.mileage ? Number(data.mileage) : undefined,
+          year: data.year ? Number(data.year) : undefined,
+          seats: data.seats ? Number(data.seats) : undefined,
+        };
+        
+        setCar(processedData);
       } catch (err) {
         console.error('Error fetching car:', err);
         setError(err instanceof Error ? err.message : 'An error occurred while loading the car details');
@@ -215,7 +229,7 @@ const CarDetailPage: React.FC = () => {
   const handleBookingClick = () => {
     if (!user) {
       // Redirect to login or show login prompt
-      window.location.href = '/login';
+      navigate('/login');
       return;
     }
     setBookingFormOpen(true);
@@ -292,12 +306,24 @@ const CarDetailPage: React.FC = () => {
                     image={car.images[0]}
                     alt={`${car.brand} ${car.name}`}
                     sx={{ height: 420, objectFit: 'cover' }}
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      const fallback = target.nextElementSibling as HTMLElement;
+                      if (fallback) fallback.style.display = 'block';
+                    }}
                   />
-                ) : (
-                  <Box sx={{ textAlign: 'center', py: 8 }}>
-                    <DirectionsCarIcon sx={{ fontSize: 200, color: 'primary.main', mb: 2 }} />
-                  </Box>
-                )}
+                ) : null}
+                <Box sx={{ 
+                  textAlign: 'center', 
+                  py: 8, 
+                  display: car.images && car.images.length > 0 ? 'none' : 'block' 
+                }}>
+                  <DirectionsCarIcon sx={{ fontSize: 200, color: 'primary.main', mb: 2 }} />
+                  <Typography variant="h6" color="text.secondary">
+                    {car.brand} {car.name}
+                  </Typography>
+                </Box>
                 <CardContent sx={{ textAlign: 'center' }}>
                   <Typography variant="h4" gutterBottom>
                     {car.year ? `${car.year} ` : ''}{car.brand} {car.name}
@@ -516,8 +542,7 @@ const CarDetailPage: React.FC = () => {
                       Please log in to write a review
                     </Typography>
                     <Button
-                      component={Link}
-                      to="/login"
+                      onClick={() => navigate('/login')}
                       variant="contained"
                       size="large"
                     >

@@ -315,10 +315,22 @@ const CarsPage: React.FC = () => {
                             height: '100%',
                             objectFit: 'cover'
                           }}
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            const fallback = target.nextElementSibling as HTMLElement;
+                            if (fallback) fallback.style.display = 'flex';
+                          }}
                         />
-                      ) : (
+                      ) : null}
+                      <Box sx={{ 
+                        display: car.images && car.images.length > 0 ? 'none' : 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        height: '100%'
+                      }}>
                         <DirectionsCarIcon sx={{ fontSize: 80, color: 'primary.main' }} />
-                      )}
+                      </Box>
                       <Chip
                         label={activeTab === 0 ? 'For Sale' : 'For Rent'}
                         color={activeTab === 0 ? 'success' : 'info'}
