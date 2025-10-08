@@ -60,31 +60,12 @@ const BookingsPage: React.FC = () => {
 
   // Fetch all bookings
   const {
-    data: allBookings,
-    isLoading: allBookingsLoading,
-    error: allBookingsError,
-    refetch: refetchAllBookings
+    data: bookingsData,
+    isLoading: bookingsLoading,
+    error: bookingsError,
+    refetch: refetchBookings
   } = useQuery(
-    ['bookings', 'all', statusFilter],
-    () => bookingService.getBookings({ 
-      status: statusFilter || undefined,
-      limit: 50 
-    }),
-    {
-      enabled: !!user,
-      retry: 2,
-      retryDelay: 1000,
-    }
-  );
-
-  // Fetch bookings as renter
-  const {
-    data: renterBookings,
-    isLoading: renterBookingsLoading,
-    error: renterBookingsError,
-    refetch: refetchRenterBookings
-  } = useQuery(
-    ['bookings', 'renter', statusFilter],
+    ['bookings', statusFilter],
     () => bookingService.getBookings({ 
       status: statusFilter || undefined,
       limit: 50 
@@ -97,12 +78,17 @@ const BookingsPage: React.FC = () => {
   );
 
   // Filter bookings based on user role
-  const myBookings = allBookings?.data.filter(booking => booking.userId === user?.id) || [];
-  const ownerBookings = allBookings?.data.filter(booking => booking.car.postedBy.id === user?.id) || [];
+  const myBookings = bookingsData?.data.filter(booking => booking.userId === user?.id) || [];
+  const ownerBookings = bookingsData?.data.filter(booking => booking.car.postedBy.id === user?.id) || [];
+
+  // Debug logging
+  console.log('Bookings Data:', bookingsData);
+  console.log('My Bookings:', myBookings);
+  console.log('Owner Bookings:', ownerBookings);
+  console.log('Current User ID:', user?.id);
 
   const handleRefresh = () => {
-    refetchAllBookings();
-    refetchRenterBookings();
+    refetchBookings();
   };
 
   const handleBookingEdit = (booking: Booking) => {
@@ -166,7 +152,7 @@ const BookingsPage: React.FC = () => {
             variant="outlined"
             startIcon={<RefreshIcon />}
             onClick={handleRefresh}
-            disabled={allBookingsLoading || renterBookingsLoading}
+            disabled={bookingsLoading}
           >
             Refresh
           </Button>
@@ -204,11 +190,11 @@ const BookingsPage: React.FC = () => {
 
         <TabPanel value={tabValue} index={0}>
           {/* My Bookings as Renter */}
-          {allBookingsLoading ? (
+          {bookingsLoading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
               <CircularProgress size={60} />
             </Box>
-          ) : allBookingsError ? (
+          ) : bookingsError ? (
             <Alert 
               severity="error" 
               sx={{ mb: 3 }}
@@ -267,11 +253,11 @@ const BookingsPage: React.FC = () => {
 
         <TabPanel value={tabValue} index={1}>
           {/* Bookings for My Cars */}
-          {allBookingsLoading ? (
+          {bookingsLoading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
               <CircularProgress size={60} />
             </Box>
-          ) : allBookingsError ? (
+          ) : bookingsError ? (
             <Alert 
               severity="error" 
               sx={{ mb: 3 }}

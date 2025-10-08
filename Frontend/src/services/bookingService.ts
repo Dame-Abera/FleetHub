@@ -76,14 +76,20 @@ class BookingService {
   }
 
   async getBookings(filters?: BookingFilters): Promise<BookingsResponse> {
-    const params = new URLSearchParams();
-    if (filters?.status) params.append('status', filters.status);
-    if (filters?.carId) params.append('carId', filters.carId);
-    if (filters?.page) params.append('page', filters.page.toString());
-    if (filters?.limit) params.append('limit', filters.limit.toString());
+    try {
+      const params = new URLSearchParams();
+      if (filters?.status) params.append('status', filters.status);
+      if (filters?.carId) params.append('carId', filters.carId);
+      if (filters?.page) params.append('page', filters.page.toString());
+      if (filters?.limit) params.append('limit', filters.limit.toString());
 
-    const response = await apiClient.get(`/bookings?${params.toString()}`);
-    return response.data;
+      const response = await apiClient.get(`/bookings?${params.toString()}`);
+      console.log('Bookings API Response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching bookings:', error);
+      throw error;
+    }
   }
 
   async getBooking(id: string): Promise<Booking> {
