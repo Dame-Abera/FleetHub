@@ -86,6 +86,7 @@ const BookingsPage: React.FC = () => {
   console.log('My Bookings:', myBookings);
   console.log('Owner Bookings:', ownerBookings);
   console.log('Current User ID:', user?.id);
+  console.log('GitHub commit test - booking functionality working!');
 
   const handleRefresh = () => {
     refetchBookings();
