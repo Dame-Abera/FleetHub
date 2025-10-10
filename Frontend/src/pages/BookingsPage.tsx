@@ -88,6 +88,11 @@ const BookingsPage: React.FC = () => {
   console.log('Current User ID:', user?.id);
   console.log('GitHub commit test - booking functionality working!');
 
+  // Calculate booking statistics
+  const totalBookings = myBookings.length + ownerBookings.length;
+  const pendingBookings = [...myBookings, ...ownerBookings].filter(b => b.status === 'PENDING').length;
+  const confirmedBookings = [...myBookings, ...ownerBookings].filter(b => b.status === 'CONFIRMED').length;
+
   const handleRefresh = () => {
     refetchBookings();
   };
@@ -159,6 +164,40 @@ const BookingsPage: React.FC = () => {
           </Button>
         </Stack>
       </Box>
+
+      {/* Booking Statistics */}
+      <Grid container spacing={2} sx={{ mb: 3 }}>
+        <Grid item xs={12} sm={4}>
+          <Paper sx={{ p: 2, textAlign: 'center', bgcolor: 'primary.light', color: 'primary.contrastText' }}>
+            <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+              {totalBookings}
+            </Typography>
+            <Typography variant="body2">
+              Total Bookings
+            </Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={4}>
+          <Paper sx={{ p: 2, textAlign: 'center', bgcolor: 'warning.light', color: 'warning.contrastText' }}>
+            <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+              {pendingBookings}
+            </Typography>
+            <Typography variant="body2">
+              Pending
+            </Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={4}>
+          <Paper sx={{ p: 2, textAlign: 'center', bgcolor: 'success.light', color: 'success.contrastText' }}>
+            <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+              {confirmedBookings}
+            </Typography>
+            <Typography variant="body2">
+              Confirmed
+            </Typography>
+          </Paper>
+        </Grid>
+      </Grid>
 
       <Paper sx={{ borderRadius: 2 }}>
         <Tabs
