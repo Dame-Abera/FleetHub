@@ -18,6 +18,7 @@ import {
   Send as SendIcon,
   SmartToy as BotIcon,
 } from '@mui/icons-material';
+import { apiClient } from '../services/apiClient';
 
 interface Message {
   id: string;
@@ -71,22 +72,12 @@ const AIChatWidget: React.FC<AIChatWidgetProps> = ({
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/ai/chat`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: userMessage.text,
-          context: context,
-        }),
+      const response = await apiClient.post('/ai/chat', {
+        message: userMessage.text,
+        context: context,
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to get AI response');
-      }
-
-      const data = await response.json();
+      const data = response.data;
       
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -136,8 +127,32 @@ const AIChatWidget: React.FC<AIChatWidgetProps> = ({
         timestamp: new Date(),
       };
       setMessages(prev => [...prev, userMessage]);
-      // Trigger AI response
-      handleSendMessage();
+      setIsLoading(true);
+      
+      // Trigger AI response directly
+      apiClient.post('/ai/chat', {
+        message: question,
+        context: context,
+      }).then(response => {
+        const botMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: response.data.response,
+          isUser: false,
+          timestamp: new Date(),
+        };
+        setMessages(prev => [...prev, botMessage]);
+      }).catch(error => {
+        console.error('Chat error:', error);
+        const errorMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: "I'm sorry, I'm having trouble connecting right now. Please try again in a moment!",
+          isUser: false,
+          timestamp: new Date(),
+        };
+        setMessages(prev => [...prev, errorMessage]);
+      }).finally(() => {
+        setIsLoading(false);
+      });
     }, 100);
   };
 

@@ -133,7 +133,7 @@ export class AiService {
   }
 
   private async nvidiaChat(message: string, context?: any): Promise<string> {
-    const apiKey =process.env.NVIDIA_API_KEY;
+    const apiKey = process.env.NVIDIA_API_KEY;
     
     if (!apiKey) {
       throw new Error('NVIDIA API key not configured');
