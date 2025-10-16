@@ -174,7 +174,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
                       Total Price
                     </Typography>
                     <Typography variant="body2" sx={{ fontWeight: 500, color: 'primary.main' }}>
-                      ${booking.totalPrice.toFixed(2)}
+                      ${typeof booking.totalPrice === 'number' ? booking.totalPrice.toFixed(2) : Number(booking.totalPrice || 0).toFixed(2)}
                     </Typography>
                   </Box>
                 </Stack>
