@@ -202,7 +202,7 @@ model SaleTransaction {
   buyerId   String
   sellerId  String
   price     Decimal  @db.Decimal(10, 2)
-  date      DateTime @default(now())
+  date      DateTime?
   notes     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
