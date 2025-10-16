@@ -404,7 +404,7 @@ const CarsPage: React.FC = () => {
                           fontSize: '1rem'
                         }}
                       >
-                        {activeTab === 0 ? 'View Details' : 'Rent Now'}
+                        {activeTab === 0 ? 'Buy Now' : 'Rent Now'}
                       </Button>
                     </CardContent>
                   </Card>
