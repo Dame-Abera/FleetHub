@@ -133,6 +133,10 @@ export class BookingsService {
     limit?: number;
   }) {
     const { status, carId, page = 1, limit = 20 } = filters || {};
+    
+    // Ensure page and limit are valid numbers
+    const validPage = Math.max(1, page || 1);
+    const validLimit = Math.max(1, Math.min(100, limit || 20));
 
     const where: any = {};
 
@@ -183,8 +187,8 @@ export class BookingsService {
           }
         },
         orderBy: { createdAt: 'desc' },
-        skip: (page - 1) * limit,
-        take: limit
+        skip: (validPage - 1) * validLimit,
+        take: validLimit
       }),
       this.prisma.booking.count({ where })
     ]);
@@ -192,10 +196,10 @@ export class BookingsService {
     return {
       data: bookings,
       pagination: {
-        page,
-        limit,
+        page: validPage,
+        limit: validLimit,
         total,
-        pages: Math.ceil(total / limit)
+        pages: Math.ceil(total / validLimit)
       }
     };
   }
