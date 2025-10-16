@@ -15,6 +15,7 @@ import ReviewCard from '../components/ReviewCard';
 import ReviewStats from '../components/ReviewStats';
 import ReviewForm from '../components/ReviewForm';
 import BookingForm from '../components/BookingForm';
+import SaleForm from '../components/SaleForm';
 
 import { reviewService } from '../services/reviewService';
 import type { Review, CreateReviewData, UpdateReviewData } from '../services/reviewService';
@@ -85,6 +86,8 @@ const CarDetailPage: React.FC = () => {
   const [reviewFormError, setReviewFormError] = useState<string | null>(null);
   const [bookingFormOpen, setBookingFormOpen] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [saleFormOpen, setSaleFormOpen] = useState(false);
+  const [saleSuccess, setSaleSuccess] = useState(false);
 
   // Fetch car details
   useEffect(() => {
@@ -238,13 +241,15 @@ const CarDetailPage: React.FC = () => {
 
   const handleBuyNowClick = () => {
     if (!user) {
-      // Redirect to login or show login prompt
       navigate('/login');
       return;
     }
-    // For now, redirect to contact seller
-    // In a real app, this would open a purchase form or payment flow
-    navigate(`/contact/${car?.postedBy?.id}`);
+    setSaleFormOpen(true);
+  };
+
+  const handleSaleSuccess = () => {
+    setSaleSuccess(true);
+    setSaleFormOpen(false);
   };
   const userReview = reviews?.find(review => review.reviewerId === user?.id);
 
@@ -629,12 +634,25 @@ const CarDetailPage: React.FC = () => {
             car={car}
           />
 
-          {/* Success Snackbar */}
+          <SaleForm
+            open={saleFormOpen}
+            onClose={() => setSaleFormOpen(false)}
+            onSuccess={handleSaleSuccess}
+            car={car}
+          />
+
+          {/* Success Snackbars */}
           <Snackbar
             open={bookingSuccess}
             autoHideDuration={6000}
             onClose={() => setBookingSuccess(false)}
             message="Booking created successfully! Check your dashboard for details."
+          />
+          <Snackbar
+            open={saleSuccess}
+            autoHideDuration={6000}
+            onClose={() => setSaleSuccess(false)}
+            message="Purchase order created successfully! The seller will review your offer."
           />
         </>
       )}

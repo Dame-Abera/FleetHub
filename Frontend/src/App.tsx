@@ -14,10 +14,10 @@ import ContactDetailsPage from './pages/ContactDetailsPage';
 import DashboardPage from './pages/DashboardPage';
 import AddCarPage from './pages/AddCarPage';
 import BookingsPage from './pages/BookingsPage';
+import SalesPage from './pages/SalesPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import AccountPage from './pages/AccountPage';
-import ReviewsPage from './pages/ReviewsPage';
 
 const theme = createTheme({
   palette: {
@@ -69,6 +69,11 @@ function App() {
                 <Route path="/bookings" element={
                   <ProtectedRoute>
                     <BookingsPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/sales" element={
+                  <ProtectedRoute>
+                    <SalesPage />
                   </ProtectedRoute>
                 } />
                 <Route path="/account" element={

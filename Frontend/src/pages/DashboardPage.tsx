@@ -82,8 +82,14 @@ interface RecentBooking {
 interface RecentSale {
   id: string;
   price: number;
-  date: string;
+  date: string | null;
+  notes?: string;
+  createdAt: string;
   buyer: {
+    name: string;
+    email: string;
+  };
+  seller: {
     name: string;
     email: string;
   };
@@ -631,6 +637,141 @@ const DashboardPage: React.FC = () => {
                      </Button>
                    </Box>
                  )}
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Sales Orders */}
+          <Grid item xs={12}>
+            <Card sx={{ boxShadow: 2, borderRadius: 2 }}>
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', color: 'text.primary' }}>
+                    <AttachMoneyIcon sx={{ mr: 1.5, color: 'success.main', fontSize: 24 }} />
+                    Sales Orders
+                    {dashboardData?.recentSales && dashboardData.recentSales.length > 0 && (
+                      <Chip 
+                        label={dashboardData.recentSales.length} 
+                        size="small" 
+                        color="success" 
+                        sx={{ ml: 1.5, fontWeight: 600 }}
+                      />
+                    )}
+                  </Typography>
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Tooltip title="Refresh Sales">
+                      <IconButton 
+                        size="small" 
+                        onClick={fetchDashboardData} 
+                        disabled={loading}
+                        sx={{ 
+                          bgcolor: 'action.hover',
+                          '&:hover': { bgcolor: 'action.selected' }
+                        }}
+                      >
+                        <RefreshIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Button 
+                      size="small" 
+                      variant="outlined"
+                      component={Link}
+                      to="/sales"
+                      sx={{ 
+                        borderRadius: 2,
+                        textTransform: 'none',
+                        fontWeight: 500
+                      }}
+                    >
+                      View All
+                    </Button>
+                  </Box>
+                </Box>
+                {dashboardData?.recentSales && dashboardData.recentSales.length > 0 ? (
+                  <List sx={{ p: 0 }}>
+                    {dashboardData.recentSales.slice(0, 5).map((sale, index) => (
+                      <React.Fragment key={sale.id}>
+                        <ListItem sx={{ px: 0, py: 1.5 }}>
+                          <ListItemAvatar>
+                            <Avatar sx={{ bgcolor: 'success.main', width: 40, height: 40 }}>
+                              <AttachMoneyIcon />
+                            </Avatar>
+                          </ListItemAvatar>
+                          <ListItemText
+                            primary={
+                              <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+                                {sale.car.year} {sale.car.brand} {sale.car.name}
+                              </Typography>
+                            }
+                            secondary={
+                              <Box>
+                                <Typography variant="body2" color="text.secondary">
+                                  {sale.buyer.email === user?.email ? 'You purchased this car' : `Purchase offer from ${sale.buyer.name}`}
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                  Order Date: {new Date(sale.createdAt).toLocaleDateString()}
+                                  {sale.date && ` • Completed: ${new Date(sale.date).toLocaleDateString()}`}
+                                </Typography>
+                                <Box sx={{ display: 'flex', gap: 1, mt: 0.5, flexWrap: 'wrap' }}>
+                                  <Chip 
+                                    label={sale.date ? 'Completed' : 'Pending'} 
+                                    size="small"
+                                    color={sale.date ? 'success' : 'warning'}
+                                    variant="outlined"
+                                  />
+                                  <Chip 
+                                    label={`$${sale.price.toLocaleString()}`} 
+                                    size="small" 
+                                    color="primary"
+                                    variant="outlined"
+                                  />
+                                  {!sale.date && sale.seller.email === user?.email && (
+                                    <Chip 
+                                      label="Action Required" 
+                                      size="small" 
+                                      color="error"
+                                      variant="outlined"
+                                    />
+                                  )}
+                                </Box>
+                              </Box>
+                            }
+                          />
+                        </ListItem>
+                        {index < Math.min(dashboardData.recentSales.length, 5) - 1 && <Divider />}
+                      </React.Fragment>
+                    ))}
+                  </List>
+                ) : (
+                  <Box sx={{ textAlign: 'center', py: 6 }}>
+                    <AttachMoneyIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 3, opacity: 0.6 }} />
+                    <Typography variant="h6" color="text.secondary" sx={{ mb: 2, fontWeight: 500 }}>
+                      No sales orders found
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 3, maxWidth: 300, mx: 'auto' }}>
+                      {user?.role === 'COMPANY_USER' 
+                        ? 'Your vehicle sales will appear here once customers make purchase offers'
+                        : 'Your purchase orders will appear here once you make offers'
+                      }
+                    </Typography>
+                    <Button 
+                      component={Link} 
+                      to="/cars" 
+                      variant="contained" 
+                      size="large"
+                      startIcon={<DirectionsCarIcon />}
+                      sx={{ 
+                        borderRadius: 2,
+                        px: 4,
+                        py: 1.5,
+                        fontWeight: 600,
+                        textTransform: 'none'
+                      }}
+                    >
+                      {user?.role === 'COMPANY_USER' ? 'Manage Fleet' : 'Browse Vehicles'}
+                    </Button>
+                  </Box>
+                )}
               </CardContent>
             </Card>
           </Grid>
