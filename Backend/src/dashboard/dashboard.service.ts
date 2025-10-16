@@ -6,6 +6,8 @@ export class DashboardService {
   constructor(private prisma: PrismaService) {}
 
   async getUserStats(userId: string) {
+    console.log('Dashboard getUserStats called for userId:', userId);
+    
     const [
       totalCars,
       activeCars,
@@ -77,11 +79,16 @@ export class DashboardService {
         }
       }),
       
-      // Recent bookings
+      // Recent bookings (both as car owner and as renter)
       this.prisma.booking.findMany({
-        where: { car: { postedById: userId } },
+        where: { 
+          OR: [
+            { car: { postedById: userId } }, // Bookings for cars owned by user
+            { userId: userId } // Bookings made by user
+          ]
+        },
         orderBy: { createdAt: 'desc' },
-        take: 5,
+        take: 10, // Increased to show more bookings
         select: {
           id: true,
           startDate: true,
@@ -116,6 +123,11 @@ export class DashboardService {
         }
       })
     ]);
+
+    console.log('Dashboard data for userId:', userId);
+    console.log('Total cars:', totalCars);
+    console.log('Recent cars:', recentCars);
+    console.log('Recent bookings:', recentBookings);
 
     return {
       stats: {
