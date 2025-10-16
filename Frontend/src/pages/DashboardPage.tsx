@@ -19,34 +19,26 @@ import {
   useTheme,
   useMediaQuery,
   TextField,
-  Stack,
   Snackbar,
   Tabs,
   Tab,
   Paper,
   IconButton,
-  Tooltip,
-  Badge
+  Tooltip
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import AddIcon from '@mui/icons-material/Add';
-import SearchIcon from '@mui/icons-material/Search';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-      
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import PendingIcon from '@mui/icons-material/Pending';
-import SellIcon from '@mui/icons-material/Sell';
 import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
 import SaveIcon from '@mui/icons-material/Save';
-import EditIcon from '@mui/icons-material/Edit';
-import SettingsIcon from '@mui/icons-material/Settings';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PersonIcon from '@mui/icons-material/Person';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 
 // Define interfaces for dashboard data
 interface DashboardStats {
@@ -165,7 +157,7 @@ const DashboardPage: React.FC = () => {
 
   useEffect(() => {
     fetchDashboardData();
-  }, []);
+  }, [user]);
 
   // Update contact form when user data changes
   useEffect(() => {
@@ -202,7 +194,7 @@ const DashboardPage: React.FC = () => {
     }
   };
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
 
@@ -245,18 +237,48 @@ const DashboardPage: React.FC = () => {
     <Container maxWidth="xl" sx={{ py: 3 }}>
       {/* Header Section */}
       <Box sx={{ mb: 4 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Box>
-            <Typography variant="h4" component="h1" sx={{ fontWeight: 700, mb: 1 }}>
-              Welcome back, {user?.name || 'User'}! 👋
+            <Typography variant="h4" component="h1" sx={{ fontWeight: 600, mb: 1, color: 'text.primary' }}>
+              Fleet Management Dashboard
             </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Here's what's happening with your fleet today
+            <Typography variant="body1" color="text.secondary" sx={{ fontSize: '1.1rem' }}>
+              Welcome back, {user?.name || 'User'} • {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
             </Typography>
           </Box>
-          <Box sx={{ display: 'flex', gap: 1 }}>
+          <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
+            <Tooltip title="Notifications">
+              <IconButton 
+                sx={{ 
+                  bgcolor: 'action.hover',
+                  '&:hover': { bgcolor: 'action.selected' },
+                  position: 'relative'
+                }}
+              >
+                <NotificationsNoneIcon />
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: 8,
+                    right: 8,
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    bgcolor: 'error.main',
+                    border: '2px solid white'
+                  }}
+                />
+              </IconButton>
+            </Tooltip>
             <Tooltip title="Refresh Data">
-              <IconButton onClick={fetchDashboardData} disabled={loading}>
+              <IconButton 
+                onClick={fetchDashboardData} 
+                disabled={loading}
+                sx={{ 
+                  bgcolor: 'action.hover',
+                  '&:hover': { bgcolor: 'action.selected' }
+                }}
+              >
                 <RefreshIcon />
               </IconButton>
             </Tooltip>
@@ -265,58 +287,93 @@ const DashboardPage: React.FC = () => {
               to="/cars/new" 
               variant="contained" 
               startIcon={<AddIcon />}
-              sx={{ borderRadius: 2 }}
+              sx={{ 
+                borderRadius: 2,
+                px: 3,
+                py: 1.5,
+                fontWeight: 600,
+                textTransform: 'none',
+                boxShadow: 2
+              }}
             >
-              Add Car
+              Add New Vehicle
             </Button>
           </Box>
         </Box>
 
-        {/* Quick Stats */}
-        <Grid container spacing={2} sx={{ mb: 3 }}>
+        {/* Key Metrics */}
+        <Grid container spacing={3} sx={{ mb: 4 }}>
           <Grid item xs={6} sm={3}>
-            <Paper sx={{ p: 2, textAlign: 'center', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>
-              <DirectionsCarIcon sx={{ fontSize: 32, mb: 1 }} />
-              <Typography variant="h5" sx={{ fontWeight: 700 }}>
+            <Card sx={{ 
+              p: 3, 
+              textAlign: 'center', 
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', 
+              color: 'white',
+              boxShadow: 3,
+              borderRadius: 2
+            }}>
+              <DirectionsCarIcon sx={{ fontSize: 40, mb: 2, opacity: 0.9 }} />
+              <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
                 {stats.totalCars}
               </Typography>
-              <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                Total Cars
+              <Typography variant="body1" sx={{ opacity: 0.9, fontWeight: 500 }}>
+                Total Vehicles
               </Typography>
-            </Paper>
+            </Card>
           </Grid>
           <Grid item xs={6} sm={3}>
-            <Paper sx={{ p: 2, textAlign: 'center', background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', color: 'white' }}>
-              <CheckCircleIcon sx={{ fontSize: 32, mb: 1 }} />
-              <Typography variant="h5" sx={{ fontWeight: 700 }}>
+            <Card sx={{ 
+              p: 3, 
+              textAlign: 'center', 
+              background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', 
+              color: 'white',
+              boxShadow: 3,
+              borderRadius: 2
+            }}>
+              <CheckCircleIcon sx={{ fontSize: 40, mb: 2, opacity: 0.9 }} />
+              <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
                 {stats.activeCars}
               </Typography>
-              <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                Active
+              <Typography variant="body1" sx={{ opacity: 0.9, fontWeight: 500 }}>
+                Active Fleet
               </Typography>
-            </Paper>
+            </Card>
           </Grid>
           <Grid item xs={6} sm={3}>
-            <Paper sx={{ p: 2, textAlign: 'center', background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', color: 'white' }}>
-              <CalendarTodayIcon sx={{ fontSize: 32, mb: 1 }} />
-              <Typography variant="h5" sx={{ fontWeight: 700 }}>
+            <Card sx={{ 
+              p: 3, 
+              textAlign: 'center', 
+              background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', 
+              color: 'white',
+              boxShadow: 3,
+              borderRadius: 2
+            }}>
+              <CalendarTodayIcon sx={{ fontSize: 40, mb: 2, opacity: 0.9 }} />
+              <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
                 {stats.confirmedBookings}
               </Typography>
-              <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                Bookings
+              <Typography variant="body1" sx={{ opacity: 0.9, fontWeight: 500 }}>
+                Active Bookings
               </Typography>
-            </Paper>
+            </Card>
           </Grid>
           <Grid item xs={6} sm={3}>
-            <Paper sx={{ p: 2, textAlign: 'center', background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', color: 'white' }}>
-              <AttachMoneyIcon sx={{ fontSize: 32, mb: 1 }} />
-              <Typography variant="h5" sx={{ fontWeight: 700 }}>
+            <Card sx={{ 
+              p: 3, 
+              textAlign: 'center', 
+              background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', 
+              color: 'white',
+              boxShadow: 3,
+              borderRadius: 2
+            }}>
+              <AttachMoneyIcon sx={{ fontSize: 40, mb: 2, opacity: 0.9 }} />
+              <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
                 ${stats.totalSales.toLocaleString()}
               </Typography>
-              <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                Revenue
+              <Typography variant="body1" sx={{ opacity: 0.9, fontWeight: 500 }}>
+                Total Revenue
               </Typography>
-            </Paper>
+            </Card>
           </Grid>
         </Grid>
       </Box>
@@ -354,17 +411,27 @@ const DashboardPage: React.FC = () => {
       {/* Tab Content */}
       {activeTab === 0 && (
         <Grid container spacing={3}>
-          {/* Recent Cars */}
+          {/* Fleet Overview */}
           <Grid item xs={12} lg={6}>
-            <Card sx={{ height: '100%' }}>
-              <CardContent>
+            <Card sx={{ height: '100%', boxShadow: 2, borderRadius: 2 }}>
+              <CardContent sx={{ p: 3 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                  <Typography variant="h6" sx={{ fontWeight: 600, display: 'flex', alignItems: 'center' }}>
-                    <DirectionsCarIcon sx={{ mr: 1, color: 'primary.main' }} />
-                    Recent Cars
+                  <Typography variant="h6" sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', color: 'text.primary' }}>
+                    <DirectionsCarIcon sx={{ mr: 1.5, color: 'primary.main', fontSize: 24 }} />
+                    Fleet Overview
                   </Typography>
-                  <Button component={Link} to="/cars" size="small" variant="outlined">
-                    View All
+                  <Button 
+                    component={Link} 
+                    to="/cars" 
+                    size="small" 
+                    variant="outlined"
+                    sx={{ 
+                      borderRadius: 2,
+                      textTransform: 'none',
+                      fontWeight: 500
+                    }}
+                  >
+                    Manage Fleet
                   </Button>
                 </Box>
                 {dashboardData?.recentCars && dashboardData.recentCars.length > 0 ? (
@@ -405,38 +472,82 @@ const DashboardPage: React.FC = () => {
                       </React.Fragment>
                     ))}
                   </List>
-                ) : (
-                  <Box sx={{ textAlign: 'center', py: 4 }}>
-                    <DirectionsCarIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
-                    <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-                      No cars yet
-                    </Typography>
-                    <Button 
-                      component={Link} 
-                      to="/cars/new" 
-                      variant="contained" 
-                      size="small"
-                    >
-                      Add Your First Car
-                    </Button>
-                  </Box>
-                )}
+                 ) : (
+                   <Box sx={{ textAlign: 'center', py: 6 }}>
+                     <DirectionsCarIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 3, opacity: 0.6 }} />
+                     <Typography variant="h6" color="text.secondary" sx={{ mb: 2, fontWeight: 500 }}>
+                       No vehicles in your fleet
+                     </Typography>
+                     <Typography variant="body2" color="text.secondary" sx={{ mb: 3, maxWidth: 300, mx: 'auto' }}>
+                       Start building your fleet by adding your first vehicle to the marketplace
+                     </Typography>
+                     <Button 
+                       component={Link} 
+                       to="/cars/new" 
+                       variant="contained" 
+                       size="large"
+                       startIcon={<AddIcon />}
+                       sx={{ 
+                         borderRadius: 2,
+                         px: 4,
+                         py: 1.5,
+                         fontWeight: 600,
+                         textTransform: 'none'
+                       }}
+                     >
+                       Add Your First Vehicle
+                     </Button>
+                   </Box>
+                 )}
               </CardContent>
             </Card>
           </Grid>
 
-          {/* Recent Bookings */}
+          {/* Booking Management */}
           <Grid item xs={12} lg={6}>
-            <Card sx={{ height: '100%' }}>
-              <CardContent>
+            <Card sx={{ height: '100%', boxShadow: 2, borderRadius: 2 }}>
+              <CardContent sx={{ p: 3 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                  <Typography variant="h6" sx={{ fontWeight: 600, display: 'flex', alignItems: 'center' }}>
-                    <CalendarTodayIcon sx={{ mr: 1, color: 'info.main' }} />
-                    Recent Bookings
+                  <Typography variant="h6" sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', color: 'text.primary' }}>
+                    <CalendarTodayIcon sx={{ mr: 1.5, color: 'info.main', fontSize: 24 }} />
+                    Booking Management
+                    {dashboardData?.recentBookings && dashboardData.recentBookings.length > 0 && (
+                      <Chip 
+                        label={dashboardData.recentBookings.length} 
+                        size="small" 
+                        color="info" 
+                        sx={{ ml: 1.5, fontWeight: 600 }}
+                      />
+                    )}
                   </Typography>
-                  <Button size="small" variant="outlined">
-                    View All
-                  </Button>
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Tooltip title="Refresh Bookings">
+                      <IconButton 
+                        size="small" 
+                        onClick={fetchDashboardData} 
+                        disabled={loading}
+                        sx={{ 
+                          bgcolor: 'action.hover',
+                          '&:hover': { bgcolor: 'action.selected' }
+                        }}
+                      >
+                        <RefreshIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Button 
+                      size="small" 
+                      variant="outlined"
+                      component={Link}
+                      to="/bookings"
+                      sx={{ 
+                        borderRadius: 2,
+                        textTransform: 'none',
+                        fontWeight: 500
+                      }}
+                    >
+                      View All
+                    </Button>
+                  </Box>
                 </Box>
                 {dashboardData?.recentBookings && dashboardData.recentBookings.length > 0 ? (
                   <List sx={{ p: 0 }}>
@@ -456,23 +567,32 @@ const DashboardPage: React.FC = () => {
                             }
                             secondary={
                               <Box>
-                                <Typography variant="body2" color="text.secondary">
-                                  by {booking.user.name}
+                                 <Typography variant="body2" color="text.secondary">
+                                   {booking.user.email === user?.email ? 'You rented this car' : `Rented by ${booking.user.name}`}
+                                 </Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                  {new Date(booking.startDate).toLocaleDateString()} - {new Date(booking.endDate).toLocaleDateString()}
                                 </Typography>
-                                <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
-                                  <Chip 
-                                    label={booking.status} 
-                                    size="small"
-                                    color={booking.status === 'CONFIRMED' ? 'success' : 'warning'}
-                                    variant="outlined"
-                                  />
-                                  <Chip 
-                                    label={`$${booking.totalPrice}`} 
-                                    size="small" 
-                                    color="primary"
-                                    variant="outlined"
-                                  />
-                                </Box>
+                                 <Box sx={{ display: 'flex', gap: 1, mt: 0.5, flexWrap: 'wrap' }}>
+                                   <Chip 
+                                     label={booking.status} 
+                                     size="small"
+                                     color={booking.status === 'CONFIRMED' ? 'success' : booking.status === 'PENDING' ? 'warning' : 'error'}
+                                     variant="outlined"
+                                   />
+                                   <Chip 
+                                     label={`$${booking.totalPrice}`} 
+                                     size="small" 
+                                     color="primary"
+                                     variant="outlined"
+                                   />
+                                   <Chip 
+                                     label={`${Math.ceil((new Date(booking.endDate).getTime() - new Date(booking.startDate).getTime()) / (1000 * 60 * 60 * 24))} days`}
+                                     size="small" 
+                                     color="info"
+                                     variant="outlined"
+                                   />
+                                 </Box>
                               </Box>
                             }
                           />
@@ -481,14 +601,36 @@ const DashboardPage: React.FC = () => {
                       </React.Fragment>
                     ))}
                   </List>
-                ) : (
-                  <Box sx={{ textAlign: 'center', py: 4 }}>
-                    <CalendarTodayIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
-                    <Typography variant="body1" color="text.secondary">
-                      No bookings yet
-                    </Typography>
-                  </Box>
-                )}
+                 ) : (
+                   <Box sx={{ textAlign: 'center', py: 6 }}>
+                     <CalendarTodayIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 3, opacity: 0.6 }} />
+                     <Typography variant="h6" color="text.secondary" sx={{ mb: 2, fontWeight: 500 }}>
+                       No bookings found
+                     </Typography>
+                     <Typography variant="body2" color="text.secondary" sx={{ mb: 3, maxWidth: 300, mx: 'auto' }}>
+                       {user?.role === 'COMPANY_USER' 
+                         ? 'Your vehicles will appear here once customers start booking them'
+                         : 'Start exploring our fleet to find your perfect vehicle'
+                       }
+                     </Typography>
+                     <Button 
+                       component={Link} 
+                       to="/cars" 
+                       variant="contained" 
+                       size="large"
+                       startIcon={<DirectionsCarIcon />}
+                       sx={{ 
+                         borderRadius: 2,
+                         px: 4,
+                         py: 1.5,
+                         fontWeight: 600,
+                         textTransform: 'none'
+                       }}
+                     >
+                       {user?.role === 'COMPANY_USER' ? 'Manage Fleet' : 'Browse Vehicles'}
+                     </Button>
+                   </Box>
+                 )}
               </CardContent>
             </Card>
           </Grid>
