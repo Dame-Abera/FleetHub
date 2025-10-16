@@ -10,6 +10,7 @@ import RateReviewIcon from '@mui/icons-material/RateReview';
 
 
 import BookOnlineIcon from '@mui/icons-material/BookOnline';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import ReviewCard from '../components/ReviewCard';
 import ReviewStats from '../components/ReviewStats';
 import ReviewForm from '../components/ReviewForm';
@@ -234,6 +235,17 @@ const CarDetailPage: React.FC = () => {
     }
     setBookingFormOpen(true);
   };
+
+  const handleBuyNowClick = () => {
+    if (!user) {
+      // Redirect to login or show login prompt
+      navigate('/login');
+      return;
+    }
+    // For now, redirect to contact seller
+    // In a real app, this would open a purchase form or payment flow
+    navigate(`/contact/${car?.postedBy?.id}`);
+  };
   const userReview = reviews?.find(review => review.reviewerId === user?.id);
 
   const featureList: string[] = useMemo(() => {
@@ -248,15 +260,6 @@ const CarDetailPage: React.FC = () => {
     return [];
   }, [car]);
 
-  // Debug information (remove in production)
-  const debugInfo = {
-    carId: id,
-    carLoaded: !!car,
-    userLoggedIn: !!user,
-    reviewsLoaded: !!reviews,
-    reviewsCount: reviews?.length || 0,
-    statsLoaded: !!reviewStats,
-  };
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -423,6 +426,24 @@ const CarDetailPage: React.FC = () => {
                           {user?.id === car.postedBy?.id 
                             ? "Can't book your own car" 
                             : "Book This Car"
+                          }
+                        </Button>
+                      )}
+                      
+                      {car.availableForSale && car.salePrice && (
+                        <Button
+                          variant="contained"
+                          color="secondary"
+                          size="large"
+                          fullWidth
+                          sx={{ py: 1.5 }}
+                          startIcon={<ShoppingCartIcon />}
+                          onClick={handleBuyNowClick}
+                          disabled={user?.id === car.postedBy?.id}
+                        >
+                          {user?.id === car.postedBy?.id 
+                            ? "Can't buy your own car" 
+                            : `Buy Now - $${car.salePrice.toLocaleString()}`
                           }
                         </Button>
                       )}
