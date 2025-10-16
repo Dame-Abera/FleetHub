@@ -105,16 +105,26 @@ export class DashboardService {
         }
       }),
       
-      // Recent sales
+      // Recent sales (both as seller and as buyer)
       this.prisma.saleTransaction.findMany({
-        where: { sellerId: userId },
-        orderBy: { date: 'desc' },
-        take: 5,
+        where: { 
+          OR: [
+            { sellerId: userId }, // Sales where user is the seller
+            { buyerId: userId }   // Sales where user is the buyer
+          ]
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 10,
         select: {
           id: true,
           price: true,
           date: true,
+          notes: true,
+          createdAt: true,
           buyer: {
+            select: { name: true, email: true }
+          },
+          seller: {
             select: { name: true, email: true }
           },
           car: {
