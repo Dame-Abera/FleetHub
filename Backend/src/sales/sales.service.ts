@@ -29,7 +29,7 @@ export class SalesService {
       throw new ForbiddenException('You cannot buy your own car');
     }
 
-    // Create the sale transaction
+    // Create the sale transaction with PENDING status
     const sale = await this.prisma.saleTransaction.create({
       data: {
         carId,
@@ -37,6 +37,7 @@ export class SalesService {
         sellerId: car.postedById,
         price,
         notes,
+        status: 'PENDING', // Explicitly set to PENDING
       },
       include: {
         car: {
@@ -45,6 +46,8 @@ export class SalesService {
             name: true,
             brand: true,
             year: true,
+            category: true,
+            mileage: true,
             images: true,
             postedBy: {
               select: {
@@ -170,6 +173,8 @@ export class SalesService {
             name: true,
             brand: true,
             year: true,
+            category: true,
+            mileage: true,
             images: true,
             postedBy: {
               select: {
@@ -230,6 +235,8 @@ export class SalesService {
             name: true,
             brand: true,
             year: true,
+            category: true,
+            mileage: true,
             images: true,
             postedBy: {
               select: {
@@ -271,9 +278,14 @@ export class SalesService {
       throw new ForbiddenException('Only the seller can confirm this sale');
     }
 
+    if (sale.status !== 'PENDING') {
+      throw new ForbiddenException('Only pending sales can be confirmed');
+    }
+
     const updatedSale = await this.prisma.saleTransaction.update({
       where: { id },
       data: { 
+        status: 'CONFIRMED',
         date: new Date(),
         notes: sale.notes ? `${sale.notes}\n\n[CONFIRMED by seller]` : '[CONFIRMED by seller]'
       },
@@ -284,6 +296,8 @@ export class SalesService {
             name: true,
             brand: true,
             year: true,
+            category: true,
+            mileage: true,
             images: true,
             postedBy: {
               select: {
@@ -325,13 +339,117 @@ export class SalesService {
       throw new ForbiddenException('Only the seller can reject this sale');
     }
 
-    // For now, we'll just delete the sale transaction
-    // In a real app, you might want to keep it with a status field
-    await this.prisma.saleTransaction.delete({
-      where: { id }
+    if (sale.status !== 'PENDING') {
+      throw new ForbiddenException('Only pending sales can be rejected');
+    }
+
+    // Update status to CANCELLED instead of deleting
+    const updatedSale = await this.prisma.saleTransaction.update({
+      where: { id },
+      data: {
+        status: 'CANCELLED',
+        notes: sale.notes ? `${sale.notes}\n\n[REJECTED by seller${reason ? `: ${reason}` : ''}]` : `[REJECTED by seller${reason ? `: ${reason}` : ''}]`
+      },
+      include: {
+        car: {
+          select: {
+            id: true,
+            name: true,
+            brand: true,
+            year: true,
+            category: true,
+            mileage: true,
+            images: true,
+            postedBy: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                phone: true
+              }
+            }
+          }
+        },
+        buyer: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true
+          }
+        },
+        seller: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true
+          }
+        }
+      }
     });
 
-    return { message: 'Sale offer rejected successfully', reason };
+    return updatedSale;
+  }
+
+  async completeSale(id: string, user: User) {
+    const sale = await this.findOne(id, user);
+
+    // Only seller can complete sale
+    if (sale.sellerId !== user.id) {
+      throw new ForbiddenException('Only the seller can complete this sale');
+    }
+
+    if (sale.status !== 'CONFIRMED') {
+      throw new ForbiddenException('Only confirmed sales can be completed');
+    }
+
+    const updatedSale = await this.prisma.saleTransaction.update({
+      where: { id },
+      data: {
+        status: 'COMPLETED',
+        notes: sale.notes ? `${sale.notes}\n\n[COMPLETED by seller]` : '[COMPLETED by seller]'
+      },
+      include: {
+        car: {
+          select: {
+            id: true,
+            name: true,
+            brand: true,
+            year: true,
+            category: true,
+            mileage: true,
+            images: true,
+            postedBy: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                phone: true
+              }
+            }
+          }
+        },
+        buyer: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true
+          }
+        },
+        seller: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true
+          }
+        }
+      }
+    });
+
+    return updatedSale;
   }
 
   async remove(id: string, user: User) {
