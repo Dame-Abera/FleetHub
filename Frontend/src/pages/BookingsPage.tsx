@@ -10,7 +10,6 @@ import {
   Alert,
   Button,
   Stack,
-  Chip,
   FormControl,
   InputLabel,
   Select,
@@ -20,12 +19,12 @@ import {
 import {
   DirectionsCar as DirectionsCarIcon,
   CalendarToday as CalendarIcon,
-  FilterList as FilterIcon,
   Refresh as RefreshIcon
 } from '@mui/icons-material';
 import { useQuery } from 'react-query';
 import { useAuth } from '../contexts/AuthContext';
 import BookingCard from '../components/BookingCard';
+import ConfirmationDialog from '../components/ConfirmationDialog';
 import { bookingService, type Booking } from '../services/bookingService';
 
 interface TabPanelProps {
@@ -53,6 +52,25 @@ const BookingsPage: React.FC = () => {
   const { user } = useAuth();
   const [tabValue, setTabValue] = useState(0);
   const [statusFilter, setStatusFilter] = useState<string>('');
+  
+  // Confirmation dialog state
+  const [confirmationDialog, setConfirmationDialog] = useState<{
+    open: boolean;
+    title: string;
+    message: string;
+    type: 'warning' | 'error' | 'info' | 'success';
+    confirmText: string;
+    onConfirm: () => void;
+    loading: boolean;
+  }>({
+    open: false,
+    title: '',
+    message: '',
+    type: 'warning',
+    confirmText: 'Confirm',
+    onConfirm: () => {},
+    loading: false
+  });
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -102,23 +120,70 @@ const BookingsPage: React.FC = () => {
     console.log('Edit booking:', booking);
   };
 
-  const handleBookingDelete = async (booking: Booking) => {
-    if (window.confirm('Are you sure you want to cancel this booking?')) {
-      try {
-        await bookingService.deleteBooking(booking.id);
-        handleRefresh();
-      } catch (error) {
-        console.error('Failed to delete booking:', error);
-      }
-    }
+  const showConfirmationDialog = (
+    title: string,
+    message: string,
+    type: 'warning' | 'error' | 'info' | 'success',
+    confirmText: string,
+    onConfirm: () => void
+  ) => {
+    setConfirmationDialog({
+      open: true,
+      title,
+      message,
+      type,
+      confirmText,
+      onConfirm,
+      loading: false
+    });
   };
 
-  const handleStatusChange = async (booking: Booking, newStatus: string) => {
-    try {
-      await bookingService.updateBooking(booking.id, { status: newStatus as any });
-      handleRefresh();
-    } catch (error) {
-      console.error('Failed to update booking status:', error);
+  const handleBookingDelete = (booking: Booking) => {
+    showConfirmationDialog(
+      'Cancel Booking',
+      `Are you sure you want to cancel this booking for ${booking.car.brand} ${booking.car.name}? This action cannot be undone.`,
+      'warning',
+      'Yes, Cancel Booking',
+      async () => {
+        setConfirmationDialog(prev => ({ ...prev, loading: true }));
+        try {
+          await bookingService.deleteBooking(booking.id);
+          handleRefresh();
+          setConfirmationDialog(prev => ({ ...prev, open: false }));
+        } catch (error) {
+          console.error('Failed to delete booking:', error);
+          setConfirmationDialog(prev => ({ ...prev, loading: false }));
+        }
+      }
+    );
+  };
+
+  const handleStatusChange = (booking: Booking, newStatus: string) => {
+    const actionText = newStatus === 'CONFIRMED' ? 'confirm' : 'cancel';
+    const carName = `${booking.car.brand} ${booking.car.name}`;
+    
+    showConfirmationDialog(
+      `${newStatus === 'CONFIRMED' ? 'Confirm' : 'Cancel'} Booking`,
+      `Are you sure you want to ${actionText} this booking for ${carName}?`,
+      newStatus === 'CONFIRMED' ? 'success' : 'warning',
+      `Yes, ${newStatus === 'CONFIRMED' ? 'Confirm' : 'Cancel'}`,
+      async () => {
+        setConfirmationDialog(prev => ({ ...prev, loading: true }));
+        try {
+          await bookingService.updateBooking(booking.id, { status: newStatus as any });
+          handleRefresh();
+          setConfirmationDialog(prev => ({ ...prev, open: false }));
+        } catch (error) {
+          console.error('Failed to update booking status:', error);
+          setConfirmationDialog(prev => ({ ...prev, loading: false }));
+        }
+      }
+    );
+  };
+
+  const handleCloseConfirmationDialog = () => {
+    if (!confirmationDialog.loading) {
+      setConfirmationDialog(prev => ({ ...prev, open: false }));
     }
   };
 
@@ -354,6 +419,18 @@ const BookingsPage: React.FC = () => {
           )}
         </TabPanel>
       </Paper>
+
+      {/* Confirmation Dialog */}
+      <ConfirmationDialog
+        open={confirmationDialog.open}
+        onClose={handleCloseConfirmationDialog}
+        onConfirm={confirmationDialog.onConfirm}
+        title={confirmationDialog.title}
+        message={confirmationDialog.message}
+        type={confirmationDialog.type}
+        confirmText={confirmationDialog.confirmText}
+        loading={confirmationDialog.loading}
+      />
     </Container>
   );
 };
