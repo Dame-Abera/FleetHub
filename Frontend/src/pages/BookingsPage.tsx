@@ -141,7 +141,7 @@ const BookingsPage: React.FC = () => {
   const handleBookingDelete = (booking: Booking) => {
     showConfirmationDialog(
       'Cancel Booking',
-      `Are you sure you want to cancel this booking for ${booking.car.brand} ${booking.car.name}? This action cannot be undone.`,
+      `Are you sure you want to cancel this booking for ${booking.car.name}? This action cannot be undone.`,
       'warning',
       'Yes, Cancel Booking',
       async () => {
@@ -160,7 +160,7 @@ const BookingsPage: React.FC = () => {
 
   const handleStatusChange = (booking: Booking, newStatus: string) => {
     const actionText = newStatus === 'CONFIRMED' ? 'confirm' : 'cancel';
-    const carName = `${booking.car.brand} ${booking.car.name}`;
+    const carName = booking.car.name;
     
     showConfirmationDialog(
       `${newStatus === 'CONFIRMED' ? 'Confirm' : 'Cancel'} Booking`,

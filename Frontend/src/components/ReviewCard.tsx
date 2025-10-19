@@ -137,7 +137,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
               Review for:
             </Typography>
             <Chip
-              label={`${review.car.brand} ${review.car.name} (${review.car.year})`}
+              label={`${review.car.name} (${review.car.year})`}
               variant="outlined"
               size="small"
               sx={{ 

@@ -121,7 +121,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
               <Box>
                 <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
-                  {booking.car.year ? `${booking.car.year} ` : ''}{booking.car.brand} {booking.car.name}
+                  {booking.car.year ? `${booking.car.year} ` : ''}{booking.car.name}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Booking ID: {booking.id.slice(0, 8)}...

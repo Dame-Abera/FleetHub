@@ -372,7 +372,7 @@ const SalesPage: React.FC = () => {
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                         <Box>
                           <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
-                            {sale.car.year} {sale.car.brand} {sale.car.name}
+                            {sale.car.year} {sale.car.name}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
                             {sale.car.category} • {sale.car.mileage?.toLocaleString()} miles
@@ -554,7 +554,7 @@ const SalesPage: React.FC = () => {
                 Sale Details:
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                <strong>Car:</strong> {selectedSale.car.year} {selectedSale.car.brand} {selectedSale.car.name}
+                <strong>Car:</strong> {selectedSale.car.year} {selectedSale.car.name}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 <strong>Price:</strong> ${selectedSale.price.toLocaleString()}
@@ -622,7 +622,7 @@ const SalesPage: React.FC = () => {
                 Sale Details:
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                <strong>Car:</strong> {selectedSale.car.year} {selectedSale.car.brand} {selectedSale.car.name}
+                <strong>Car:</strong> {selectedSale.car.year} {selectedSale.car.name}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 <strong>Price:</strong> ${selectedSale.price.toLocaleString()}

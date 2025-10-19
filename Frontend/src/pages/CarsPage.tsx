@@ -346,7 +346,7 @@ const CarsPage: React.FC = () => {
                     
                     <CardContent sx={{ flexGrow: 1, p: 3 }}>
                       <Typography variant="h5" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
-                        {car.year} {car.brand} {car.name}
+                        {car.year} {car.name}
                       </Typography>
                       
                       <Box sx={{ mb: 2 }}>

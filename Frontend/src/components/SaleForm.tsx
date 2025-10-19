@@ -132,7 +132,7 @@ const SaleForm: React.FC<SaleFormProps> = ({ open, onClose, car, onSuccess }) =>
         <Card sx={{ mb: 3, bgcolor: 'grey.50' }}>
           <CardContent sx={{ p: 2 }}>
             <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-              {car.year} {car.brand} {car.name}
+              {car.year} {car.name}
             </Typography>
             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
               <Chip label={car.category} size="small" color="primary" variant="outlined" />

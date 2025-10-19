@@ -153,7 +153,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ open, onClose, onSuccess, car
             Book This Car
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {car.year ? `${car.year} ` : ''}{car.brand} {car.name}
+            {car.year ? `${car.year} ` : ''}{car.name}
           </Typography>
         </DialogTitle>
 
@@ -172,7 +172,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ open, onClose, onSuccess, car
                     <Box sx={{ mb: 2 }}>
                       <img
                         src={car.images[0]}
-                        alt={`${car.brand} ${car.name}`}
+                        alt={car.name}
                         style={{
                           width: '100%',
                           height: 120,

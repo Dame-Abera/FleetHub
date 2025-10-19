@@ -344,12 +344,12 @@ const CarDetailPage: React.FC = () => {
                 }}>
                   <DirectionsCarIcon sx={{ fontSize: 200, color: 'primary.main', mb: 2 }} />
                   <Typography variant="h6" color="text.secondary">
-                    {car.brand} {car.name}
+                    {car.name}
                   </Typography>
                 </Box>
                 <CardContent sx={{ textAlign: 'center' }}>
                   <Typography variant="h4" gutterBottom>
-                    {car.year ? `${car.year} ` : ''}{car.brand} {car.name}
+                    {car.year ? `${car.year} ` : ''}{car.name}
                   </Typography>
                   <Typography variant="h3" color="primary" sx={{ fontWeight: 700 }}>
                     {car.availableForSale && car.salePrice
@@ -635,7 +635,7 @@ const CarDetailPage: React.FC = () => {
             onClose={() => setReviewFormOpen(false)}
             onSubmit={handleReviewSubmit}
             review={editingReview}
-            carName={`${car.brand} ${car.name}`}
+            carName={car.name}
             ownerName={car.postedBy?.name}
             loading={reviewFormLoading}
             error={reviewFormError || undefined}

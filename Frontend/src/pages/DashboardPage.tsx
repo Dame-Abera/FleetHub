@@ -454,7 +454,7 @@ const DashboardPage: React.FC = () => {
                           <ListItemText
                             primary={
                               <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
-                                {car.year} {car.brand} {car.name}
+                                {car.year} {car.name}
                               </Typography>
                             }
                             secondary={
@@ -569,7 +569,7 @@ const DashboardPage: React.FC = () => {
                           <ListItemText
                             primary={
                               <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
-                                {booking.car.year} {booking.car.brand} {booking.car.name}
+                                {booking.car.year} {booking.car.name}
                               </Typography>
                             }
                             secondary={
@@ -701,7 +701,7 @@ const DashboardPage: React.FC = () => {
                           <ListItemText
                             primary={
                               <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
-                                {sale.car.year} {sale.car.brand} {sale.car.name}
+                                {sale.car.year} {sale.car.name}
                               </Typography>
                             }
                             secondary={
