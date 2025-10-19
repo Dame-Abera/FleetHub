@@ -81,4 +81,10 @@ export class SalesController {
   ) {
     return this.salesService.rejectSale(id, user, body?.reason);
   }
+
+  @Post(':id/complete')
+  @ApiOperation({ summary: 'Complete a sale transaction' })
+  completeSale(@Param('id') id: string, @GetUser() user: User) {
+    return this.salesService.completeSale(id, user);
+  }
 }
