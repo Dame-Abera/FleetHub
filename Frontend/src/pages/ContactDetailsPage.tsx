@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { API_BASE_URL } from '../config/api';
 import { Container, Typography, Box, Card, CardContent, Grid, Button, Chip, Divider, Alert, CircularProgress, Stack } from '@mui/material';
 import { useParams, Link } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -37,7 +38,7 @@ const ContactDetailsPage: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/users/${userId}`);
+        const response = await fetch(`${API_BASE_URL}/users/${userId}`);
         if (!response.ok) {
           throw new Error('Failed to fetch user details');
         }
