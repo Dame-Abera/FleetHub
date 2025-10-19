@@ -32,7 +32,7 @@ import {
 } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useAuth } from '../contexts/AuthContext';
-import { getSales, confirmSale, rejectSale } from '../services/saleService';
+import { getSales, confirmSale, rejectSale, completeSale } from '../services/saleService';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import PersonIcon from '@mui/icons-material/Person';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
@@ -54,6 +54,7 @@ const SalesPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
+  const [completeDialogOpen, setCompleteDialogOpen] = useState(false);
   const [selectedSaleId, setSelectedSaleId] = useState<string | null>(null);
   const [selectedSale, setSelectedSale] = useState<any>(null);
   const [rejectReason, setRejectReason] = useState('');
@@ -96,6 +97,19 @@ const SalesPage: React.FC = () => {
     }
   });
 
+  const completeMutation = useMutation(completeSale, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(['sales']);
+      setSnackbarMessage('Sale completed successfully!');
+      setSnackbarOpen(true);
+      setCompleteDialogOpen(false);
+    },
+    onError: (error: any) => {
+      setSnackbarMessage(`Error: ${error.response?.data?.message || 'Failed to complete sale'}`);
+      setSnackbarOpen(true);
+    }
+  });
+
   const handleRefresh = () => {
     setRefreshKey(prev => prev + 1);
     refetch();
@@ -132,9 +146,21 @@ const SalesPage: React.FC = () => {
     setRejectDialogOpen(true);
   };
 
+  const handleCompleteClick = (sale: any) => {
+    setSelectedSale(sale);
+    setSelectedSaleId(sale.id);
+    setCompleteDialogOpen(true);
+  };
+
   const handleRejectConfirm = () => {
     if (selectedSaleId) {
-      rejectMutation.mutate(selectedSaleId, { reason: rejectReason });
+      rejectMutation.mutate({ id: selectedSaleId, reason: rejectReason });
+    }
+  };
+
+  const handleCompleteConfirm = () => {
+    if (selectedSaleId) {
+      completeMutation.mutate(selectedSaleId);
     }
   };
 
