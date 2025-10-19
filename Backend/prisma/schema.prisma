@@ -196,16 +196,24 @@ model Booking {
   @@map("bookings")
 }
 
+enum SaleStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
 model SaleTransaction {
-  id        String   @id @default(uuid())
+  id        String     @id @default(uuid())
   carId     String
   buyerId   String
   sellerId  String
-  price     Decimal  @db.Decimal(10, 2)
+  price     Decimal    @db.Decimal(10, 2)
+  status    SaleStatus @default(PENDING)
   date      DateTime?
   notes     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 
   // Relationships
   car       Car      @relation(fields: [carId], references: [id])
