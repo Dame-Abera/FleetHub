@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { API_BASE_URL } from '../config/api';
 
 import { Container, Typography, Box, Button, Grid, Card, CardContent, Chip, Divider, CardMedia, Alert, CircularProgress, Stack, Tabs, Tab, Paper, Snackbar } from '@mui/material';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import StarIcon from '@mui/icons-material/Star';
@@ -75,6 +76,7 @@ function TabPanel(props: TabPanelProps) {
 const CarDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [car, setCar] = useState<Car | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -96,7 +98,7 @@ const CarDetailPage: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/cars/${id}`);
+        const response = await fetch(`${API_BASE_URL}/cars/${id}`);
         if (!response.ok) {
           if (response.status === 404) {
             throw new Error('Car not found');
@@ -136,7 +138,6 @@ const CarDetailPage: React.FC = () => {
     data: reviews,
     isLoading: reviewsLoading,
     error: reviewsError,
-    refetch: refetchReviews,
   } = useQuery(
     ['car-reviews', id],
     () => reviewService.getReviewsByCar(id!),
@@ -182,7 +183,15 @@ const CarDetailPage: React.FC = () => {
     if (window.confirm('Are you sure you want to delete this review?')) {
       try {
         await reviewService.deleteReview(reviewId);
-        refetchReviews();
+        
+        // Invalidate all review-related queries to update all pages instantly
+        queryClient.invalidateQueries(['car-reviews', id]);
+        queryClient.invalidateQueries(['reviews']);
+        queryClient.invalidateQueries(['featured-reviews']);
+        queryClient.invalidateQueries(['car-review-stats', id]);
+        if (car?.postedBy?.id) {
+          queryClient.invalidateQueries(['review-stats', car.postedBy.id]);
+        }
       } catch (error) {
         console.error('Failed to delete review:', error);
       }
@@ -211,7 +220,13 @@ const CarDetailPage: React.FC = () => {
         });
       }
       
-      await refetchReviews();
+      // Invalidate all review-related queries to update all pages instantly
+      queryClient.invalidateQueries(['car-reviews', id]);
+      queryClient.invalidateQueries(['reviews']);
+      queryClient.invalidateQueries(['featured-reviews']);
+      queryClient.invalidateQueries(['car-review-stats', id]);
+      queryClient.invalidateQueries(['review-stats', car.postedBy.id]);
+      
       setReviewFormOpen(false);
     } catch (error: any) {
       console.error('Review submission error:', error);
