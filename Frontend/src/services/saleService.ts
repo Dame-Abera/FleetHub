@@ -12,6 +12,7 @@ export interface SaleTransaction {
   buyerId: string;
   sellerId: string;
   price: number;
+  status: 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
   date: string | null;
   notes?: string;
   createdAt: string;
@@ -21,6 +22,8 @@ export interface SaleTransaction {
     name: string;
     brand: string;
     year: number;
+    category: string;
+    mileage?: number;
     images: string[];
     postedBy: {
       id: string;
@@ -87,7 +90,12 @@ export const confirmSale = async (id: string): Promise<SaleTransaction> => {
   return response.data;
 };
 
-export const rejectSale = async (id: string, reason?: string): Promise<{ message: string; reason?: string }> => {
+export const rejectSale = async ({ id, reason }: { id: string; reason?: string }): Promise<SaleTransaction> => {
   const response = await apiClient.post(`/sales/${id}/reject`, { reason });
+  return response.data;
+};
+
+export const completeSale = async (id: string): Promise<SaleTransaction> => {
+  const response = await apiClient.post(`/sales/${id}/complete`);
   return response.data;
 };
