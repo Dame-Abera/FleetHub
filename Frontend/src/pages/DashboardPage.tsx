@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config/api';
 import { 
   Container, 
   Typography, 
@@ -140,7 +141,7 @@ const DashboardPage: React.FC = () => {
         throw new Error('No authentication token found');
       }
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/dashboard/stats`, {
+      const response = await fetch(`${API_BASE_URL}/dashboard/stats`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
