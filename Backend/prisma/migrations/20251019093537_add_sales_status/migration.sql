@@ -1,0 +1,7 @@
+-- CreateEnum
+CREATE TYPE "SaleStatus" AS ENUM ('PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED');
+
+-- AlterTable
+ALTER TABLE "sale_transactions" ADD COLUMN     "status" "SaleStatus" NOT NULL DEFAULT 'PENDING',
+ALTER COLUMN "date" DROP NOT NULL,
+ALTER COLUMN "date" DROP DEFAULT;
