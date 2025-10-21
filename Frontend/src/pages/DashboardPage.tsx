@@ -479,7 +479,7 @@ const DashboardPage: React.FC = () => {
                       </React.Fragment>
                     ))}
                   </List>
-                 ) : (
+                ) : (
                    <Box sx={{ textAlign: 'center', py: 6 }}>
                      <DirectionsCarIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 3, opacity: 0.6 }} />
                      <Typography variant="h6" color="text.secondary" sx={{ mb: 2, fontWeight: 500 }}>
@@ -487,11 +487,11 @@ const DashboardPage: React.FC = () => {
                      </Typography>
                      <Typography variant="body2" color="text.secondary" sx={{ mb: 3, maxWidth: 300, mx: 'auto' }}>
                        Start building your fleet by adding your first vehicle to the marketplace
-                     </Typography>
-                     <Button 
-                       component={Link} 
-                       to="/cars/new" 
-                       variant="contained" 
+                    </Typography>
+                    <Button 
+                      component={Link} 
+                      to="/cars/new" 
+                      variant="contained" 
                        size="large"
                        startIcon={<AddIcon />}
                        sx={{ 
@@ -503,9 +503,9 @@ const DashboardPage: React.FC = () => {
                        }}
                      >
                        Add Your First Vehicle
-                     </Button>
-                   </Box>
-                 )}
+                    </Button>
+                  </Box>
+                )}
               </CardContent>
             </Card>
           </Grid>
@@ -552,8 +552,8 @@ const DashboardPage: React.FC = () => {
                         fontWeight: 500
                       }}
                     >
-                      View All
-                    </Button>
+                    View All
+                  </Button>
                   </Box>
                 </Box>
                 {dashboardData?.recentBookings && dashboardData.recentBookings.length > 0 ? (
@@ -574,32 +574,32 @@ const DashboardPage: React.FC = () => {
                             }
                             secondary={
                               <Box>
-                                 <Typography variant="body2" color="text.secondary">
+                                <Typography variant="body2" color="text.secondary">
                                    {booking.user.email === user?.email ? 'You rented this car' : `Rented by ${booking.user.name}`}
-                                 </Typography>
+                                </Typography>
                                 <Typography variant="caption" color="text.secondary">
                                   {new Date(booking.startDate).toLocaleDateString()} - {new Date(booking.endDate).toLocaleDateString()}
                                 </Typography>
                                  <Box sx={{ display: 'flex', gap: 1, mt: 0.5, flexWrap: 'wrap' }}>
-                                   <Chip 
-                                     label={booking.status} 
-                                     size="small"
+                                  <Chip 
+                                    label={booking.status} 
+                                    size="small"
                                      color={booking.status === 'CONFIRMED' ? 'success' : booking.status === 'PENDING' ? 'warning' : 'error'}
-                                     variant="outlined"
-                                   />
-                                   <Chip 
-                                     label={`$${booking.totalPrice}`} 
-                                     size="small" 
-                                     color="primary"
-                                     variant="outlined"
-                                   />
+                                    variant="outlined"
+                                  />
+                                  <Chip 
+                                    label={`$${booking.totalPrice}`} 
+                                    size="small" 
+                                    color="primary"
+                                    variant="outlined"
+                                  />
                                    <Chip 
                                      label={`${Math.ceil((new Date(booking.endDate).getTime() - new Date(booking.startDate).getTime()) / (1000 * 60 * 60 * 24))} days`}
                                      size="small" 
                                      color="info"
-                                     variant="outlined"
-                                   />
-                                 </Box>
+                                    variant="outlined"
+                                  />
+                                </Box>
                               </Box>
                             }
                           />
@@ -608,12 +608,12 @@ const DashboardPage: React.FC = () => {
                       </React.Fragment>
                     ))}
                   </List>
-                 ) : (
+                ) : (
                    <Box sx={{ textAlign: 'center', py: 6 }}>
                      <CalendarTodayIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 3, opacity: 0.6 }} />
                      <Typography variant="h6" color="text.secondary" sx={{ mb: 2, fontWeight: 500 }}>
                        No bookings found
-                     </Typography>
+                    </Typography>
                      <Typography variant="body2" color="text.secondary" sx={{ mb: 3, maxWidth: 300, mx: 'auto' }}>
                        {user?.role === 'COMPANY_USER' 
                          ? 'Your vehicles will appear here once customers start booking them'

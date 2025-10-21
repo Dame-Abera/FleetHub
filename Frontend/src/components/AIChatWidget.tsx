@@ -73,8 +73,8 @@ const AIChatWidget: React.FC<AIChatWidgetProps> = ({
 
     try {
       const response = await apiClient.post('/ai/chat', {
-        message: userMessage.text,
-        context: context,
+          message: userMessage.text,
+          context: context,
       });
 
       const data = response.data;
