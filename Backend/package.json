@@ -24,6 +24,7 @@
     "db:seed:dev": "ts-node scripts/seed-dev.ts"
   },
   "dependencies": {
+    "@cloudinary/url-gen": "^1.22.0",
     "@nestjs/cli": "^10.0.0",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.0.0",
@@ -36,6 +37,7 @@
     "bcryptjs": "^2.4.3",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
+    "cloudinary": "^2.8.0",
     "langchain": "^0.0.200",
     "multer": "^2.0.2",
     "passport": "^0.6.0",

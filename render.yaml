@@ -16,12 +16,22 @@ services:
         value: 7d
       - key: FRONTEND_URL
         value: https://fleethubet.vercel.app/
+      # Option 1: Use Render's free database (if available)
+      # - key: DATABASE_URL
+      #   fromDatabase:
+      #     name: fleethub-db
+      #     property: connectionString
+      # Option 2: Use external free database (Neon/Supabase) - RECOMMENDED
+      # Replace with your Neon connection string from neon.tech:
       - key: DATABASE_URL
-        fromDatabase:
-          name: fleethub-db
-          property: connectionString
+        sync: false  # Set to false and add your connection string in Render dashboard
+      # Public URL for serving uploaded files
+      # Replace with your actual Render backend URL after deployment
+      - key: PUBLIC_BASE_URL
+        sync: false  # Set this to https://your-backend.onrender.com in Render dashboard
     healthCheckPath: /health
 
-databases:
-  - name: fleethub-db
-    plan: free
+# Uncomment below if using Render's database (Option 1)
+# databases:
+#   - name: fleethub-db
+#     plan: free
