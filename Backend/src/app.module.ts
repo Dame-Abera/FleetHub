@@ -13,6 +13,16 @@ import { PrismaModule } from './prisma/prisma.module';
 
 @Controller()
 export class HealthController {
+  @Get()
+  root() {
+    return { 
+      message: 'FleetHub API is running! 🚗',
+      docs: '/api',
+      health: '/health',
+      timestamp: new Date().toISOString() 
+    };
+  }
+
   @Get('health')
   health() {
     return { status: 'ok', timestamp: new Date().toISOString() };

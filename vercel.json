@@ -3,7 +3,7 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "env": {
-    "VITE_API_URL": "https://fleethub-backend.onrender.com",
+    "VITE_API_URL": "https://fleethub-backend-6kh2.onrender.com",
     "VITE_NODE_ENV": "production"
   },
   "rewrites": [

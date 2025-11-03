@@ -5,8 +5,8 @@
 // For production, always use the remote backend
 const isProduction = import.meta.env.PROD || import.meta.env.VITE_NODE_ENV === 'production';
 export const API_BASE_URL = isProduction 
-  ? 'https://fleethub-backend.onrender.com'
-  : (import.meta.env.VITE_API_URL || 'https://fleethub-backend.onrender.com');
+  ? 'https://fleethub-backend-6kh2.onrender.com'
+  : (import.meta.env.VITE_API_URL || 'https://fleethub-backend-6kh2.onrender.com');
 
 // API endpoints
 export const API_ENDPOINTS = {

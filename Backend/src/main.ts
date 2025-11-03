@@ -15,14 +15,30 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
   
   app.enableCors({
-    origin: [
-      'http://localhost:3000', 
-      'http://localhost:5173',
-      'https://fleethubet.vercel.app',
-      'https://frontend-a2vfp59n6-dame-aberas-projects.vercel.app',
-      process.env.FRONTEND_URL || 'https://fleethubet.vercel.app'
-    ],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, curl, etc.)
+      if (!origin) return callback(null, true);
+      
+      const allowedOrigins = [
+        'http://localhost:3000', 
+        'http://localhost:5173',
+        'https://fleethubet.vercel.app',
+        'https://frontend-a2vfp59n6-dame-aberas-projects.vercel.app',
+        process.env.FRONTEND_URL || 'https://fleethubet.vercel.app'
+      ];
+      
+      // Allow all Vercel preview deployments
+      const isVercel = origin.includes('.vercel.app') || origin.includes('vercel.app');
+      
+      if (allowedOrigins.includes(origin) || isVercel) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   });
   
   app.useGlobalPipes(new ValidationPipe({
