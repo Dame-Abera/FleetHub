@@ -576,6 +576,57 @@ async function main() {
         isActive: true,
       },
     }),
+    prisma.user.upsert({
+      where: { email: 'customer3@example.com' },
+      update: {},
+      create: {
+        name: 'David Brown',
+        email: 'customer3@example.com',
+        passwordHash: await bcrypt.hash('password123', 10),
+        role: UserRole.CUSTOMER,
+        phone: '+1-555-0600',
+        address: '987 Review Lane',
+        city: 'Houston',
+        state: 'TX',
+        zipCode: '77001',
+        country: 'USA',
+        isActive: true,
+      },
+    }),
+    prisma.user.upsert({
+      where: { email: 'customer4@example.com' },
+      update: {},
+      create: {
+        name: 'Lisa Anderson',
+        email: 'customer4@example.com',
+        passwordHash: await bcrypt.hash('password123', 10),
+        role: UserRole.CUSTOMER,
+        phone: '+1-555-0700',
+        address: '456 Test Street',
+        city: 'Phoenix',
+        state: 'AZ',
+        zipCode: '85001',
+        country: 'USA',
+        isActive: true,
+      },
+    }),
+    prisma.user.upsert({
+      where: { email: 'customer5@example.com' },
+      update: {},
+      create: {
+        name: 'James Miller',
+        email: 'customer5@example.com',
+        passwordHash: await bcrypt.hash('password123', 10),
+        role: UserRole.CUSTOMER,
+        phone: '+1-555-0800',
+        address: '789 Sample Ave',
+        city: 'Seattle',
+        state: 'WA',
+        zipCode: '98101',
+        country: 'USA',
+        isActive: true,
+      },
+    }),
   ]);
 
   console.log('✅ Customers created:', customers.length);
@@ -625,31 +676,82 @@ async function main() {
 
   console.log('✅ Bookings created:', bookings.length);
 
-  // Create sample reviews
-  const reviews = await Promise.all([
-    prisma.review.create({
-      data: {
-        carId: createdCars[0].id,
-        reviewerId: customers[0].id,
-        revieweeId: companyUsers[0].id,
-        rating: 5,
-        title: 'Excellent car!',
-        comment: 'The BMW X5 was perfect for our family trip. Clean, comfortable, and great performance.',
-        isVerified: true,
-      },
-    }),
-    prisma.review.create({
-      data: {
-        carId: createdCars[1].id,
-        reviewerId: customers[1].id,
-        revieweeId: companyUsers[1].id,
-        rating: 4,
-        title: 'Great electric car',
-        comment: 'Tesla Model 3 was amazing. Super quiet and the autopilot feature is incredible.',
-        isVerified: true,
-      },
-    }),
-  ]);
+  // Create sample reviews for all cars
+  const reviewTemplates = [
+    // BMW X5 reviews
+    { carIndex: 0, reviewerIndex: 0, revieweeIndex: 0, rating: 5, title: 'Excellent car!', comment: 'The BMW X5 was perfect for our family trip. Clean, comfortable, and great performance. Highly recommend!' },
+    { carIndex: 0, reviewerIndex: 1, revieweeIndex: 0, rating: 5, title: 'Luxury at its best', comment: 'Amazing SUV with premium features. The leather seats and sunroof made our journey unforgettable.' },
+    { carIndex: 0, reviewerIndex: 2, revieweeIndex: 0, rating: 4, title: 'Great family car', comment: 'Spacious and comfortable for long trips. Very reliable and stylish.' },
+    
+    // Tesla Model 3 reviews
+    { carIndex: 1, reviewerIndex: 1, revieweeIndex: 1, rating: 5, title: 'Amazing electric car', comment: 'Tesla Model 3 was incredible. Super quiet, fast acceleration, and the autopilot feature is mind-blowing!' },
+    { carIndex: 1, reviewerIndex: 2, revieweeIndex: 1, rating: 5, title: 'Best EV I\'ve driven', comment: 'Charging was easy and the range is excellent. Modern interior and great tech features.' },
+    { carIndex: 1, reviewerIndex: 3, revieweeIndex: 1, rating: 4, title: 'Great electric car', comment: 'Loved the quiet ride and instant torque. Only minor complaint is the interior could be more luxurious.' },
+    
+    // Mercedes-Benz C-Class reviews
+    { carIndex: 2, reviewerIndex: 0, revieweeIndex: 0, rating: 5, title: 'Pure luxury', comment: 'Mercedes-Benz C-Class exceeded expectations. Smooth ride, premium materials, and excellent safety features.' },
+    { carIndex: 2, reviewerIndex: 3, revieweeIndex: 0, rating: 4, title: 'Elegant and comfortable', comment: 'Beautiful design and very comfortable seats. Perfect for business trips.' },
+    
+    // Audi Q7 reviews
+    { carIndex: 3, reviewerIndex: 1, revieweeIndex: 1, rating: 5, title: 'Premium SUV', comment: 'Audi Q7 with quattro all-wheel drive handles beautifully. Great for all weather conditions.' },
+    { carIndex: 3, reviewerIndex: 4, revieweeIndex: 1, rating: 4, title: 'Spacious and powerful', comment: 'Lots of space for the whole family. Powerful engine and smooth transmission.' },
+    
+    // Toyota Camry reviews
+    { carIndex: 4, reviewerIndex: 2, revieweeIndex: 1, rating: 5, title: 'Reliable and efficient', comment: 'Toyota Camry is exactly what you expect - reliable, fuel-efficient, and comfortable. Great value!' },
+    { carIndex: 4, reviewerIndex: 3, revieweeIndex: 1, rating: 4, title: 'Perfect daily driver', comment: 'Hybrid system works seamlessly. Great gas mileage and smooth ride.' },
+    
+    // Honda CR-V reviews
+    { carIndex: 5, reviewerIndex: 4, revieweeIndex: 0, rating: 5, title: 'Perfect family SUV', comment: 'Honda CR-V is perfect for families. Safe, reliable, and has great cargo space.' },
+    { carIndex: 5, reviewerIndex: 0, revieweeIndex: 0, rating: 4, title: 'Great compact SUV', comment: 'Comfortable seats and good visibility. Lane assist feature is helpful on highways.' },
+    
+    // Porsche 911 reviews
+    { carIndex: 6, reviewerIndex: 2, revieweeIndex: 0, rating: 5, title: 'Dream car!', comment: 'Porsche 911 is absolutely incredible! The performance, handling, and sound are out of this world!' },
+    { carIndex: 6, reviewerIndex: 4, revieweeIndex: 0, rating: 5, title: 'Ultimate sports car', comment: 'Fast, precise, and exhilarating. Sport mode is amazing. Best driving experience ever!' },
+    
+    // Ford F-150 reviews
+    { carIndex: 7, reviewerIndex: 1, revieweeIndex: 1, rating: 5, title: 'Best pickup truck', comment: 'Ford F-150 lives up to its reputation. Powerful, comfortable, and great for work and play.' },
+    { carIndex: 7, reviewerIndex: 3, revieweeIndex: 1, rating: 4, title: 'Solid work truck', comment: 'Great for towing and hauling. Comfortable interior for a truck. Very capable off-road.' },
+    
+    // Volkswagen Golf reviews
+    { carIndex: 8, reviewerIndex: 4, revieweeIndex: 0, rating: 4, title: 'Fun to drive', comment: 'Volkswagen Golf is zippy and fun. Manual transmission is smooth and fuel efficient.' },
+    { carIndex: 8, reviewerIndex: 0, revieweeIndex: 0, rating: 4, title: 'Great compact car', comment: 'European handling is excellent. Perfect size for city driving and parking.' },
+    
+    // Subaru Outback reviews
+    { carIndex: 9, reviewerIndex: 2, revieweeIndex: 1, rating: 5, title: 'Adventure ready', comment: 'Subaru Outback with all-wheel drive is perfect for mountain trips. Great in snow and rough terrain.' },
+    { carIndex: 9, reviewerIndex: 1, revieweeIndex: 1, rating: 4, title: 'Reliable wagon', comment: 'Spacious cargo area and excellent visibility. Great for road trips and outdoor adventures.' },
+    
+    // Lexus RX 350 reviews
+    { carIndex: 10, reviewerIndex: 3, revieweeIndex: 0, rating: 5, title: 'Luxury perfection', comment: 'Lexus RX 350 is beautifully crafted. Premium materials, quiet cabin, and smooth ride.' },
+    { carIndex: 10, reviewerIndex: 4, revieweeIndex: 0, rating: 5, title: 'Best luxury SUV', comment: 'Advanced safety features work great. Adaptive cruise and lane departure warning are lifesavers.' },
+    
+    // Mazda MX-5 Miata reviews
+    { carIndex: 11, reviewerIndex: 2, revieweeIndex: 1, rating: 5, title: 'Pure driving joy', comment: 'Mazda MX-5 Miata is the most fun car I\'ve ever driven! Perfect convertible for weekend drives.' },
+    { carIndex: 11, reviewerIndex: 0, revieweeIndex: 1, rating: 5, title: 'Amazing convertible', comment: 'Top-down driving is incredible. Sport mode makes it feel like a race car!' },
+    
+    // Nissan Leaf reviews
+    { carIndex: 12, reviewerIndex: 4, revieweeIndex: 0, rating: 4, title: 'Affordable EV', comment: 'Nissan Leaf is perfect for city commuting. Charging is easy and the regenerative braking is cool.' },
+    { carIndex: 12, reviewerIndex: 1, revieweeIndex: 0, rating: 4, title: 'Great electric option', comment: 'Silent operation and instant torque. Great value for an electric vehicle.' },
+    
+    // Jeep Wrangler reviews
+    { carIndex: 13, reviewerIndex: 3, revieweeIndex: 1, rating: 5, title: 'Off-road beast!', comment: 'Jeep Wrangler is incredible off-road! Removable doors and roof make for an amazing open-air experience.' },
+    { carIndex: 13, reviewerIndex: 0, revieweeIndex: 1, rating: 4, title: 'Iconic adventure vehicle', comment: 'Perfect for off-road adventures. Four-wheel drive is unstoppable. Very capable vehicle!' },
+  ];
+
+  const reviews = await Promise.all(
+    reviewTemplates.map((template) =>
+      prisma.review.create({
+        data: {
+          carId: createdCars[template.carIndex].id,
+          reviewerId: customers[template.reviewerIndex].id,
+          revieweeId: companyUsers[template.revieweeIndex].id,
+          rating: template.rating,
+          title: template.title,
+          comment: template.comment,
+          isVerified: template.rating >= 4, // Verify 4+ star reviews
+        },
+      })
+    )
+  );
 
   console.log('✅ Reviews created:', reviews.length);
 
@@ -694,6 +796,10 @@ async function main() {
   console.log('Admin: admin@fleethub.com / admin123');
   console.log('Company User: john@luxurycars.com / password123');
   console.log('Customer: customer1@example.com / password123');
+  console.log('Customer: customer2@example.com / password123');
+  console.log('Customer: customer3@example.com / password123');
+  console.log('Customer: customer4@example.com / password123');
+  console.log('Customer: customer5@example.com / password123');
 }
 
 main()
