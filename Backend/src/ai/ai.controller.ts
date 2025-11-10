@@ -89,11 +89,11 @@ export class AiController {
   @ApiOperation({ summary: 'Test AI service connection' })
   async testAiService() {
     try {
-      const response = await this.aiService.enhancedChatbot("Hello, test message");
+      const response = await this.aiService.enhancedChatbot('Hello, test message');
       return { 
         status: 'success', 
         message: 'AI service is working',
-        response: response,
+        response,
         hasNvidiaKey: !!process.env.NVIDIA_API_KEY,
         provider: process.env.NVIDIA_API_KEY ? 'NVIDIA' : 'Fallback'
       };
@@ -101,7 +101,7 @@ export class AiController {
       return { 
         status: 'error', 
         message: 'AI service test failed',
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         hasNvidiaKey: !!process.env.NVIDIA_API_KEY,
         provider: 'Fallback'
       };
@@ -133,7 +133,7 @@ export class AiController {
           messages: [
             {
               role: 'user',
-              content: 'Hello, test message'
+              content: 'Hello, test message',
             }
           ],
           max_tokens: 50,
@@ -165,7 +165,7 @@ export class AiController {
       return {
         status: 'error',
         message: 'NVIDIA API test failed',
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         hasApiKey: true,
         apiKeyLength: apiKey.length
       };
