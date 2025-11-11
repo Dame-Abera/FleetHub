@@ -105,7 +105,7 @@ The application will be available at:
 - **Backend API**: http://localhost:3001
 - **API Documentation**: http://localhost:3001/api
 
-## 📊 Database Models
+##  Database Models
 
 ### User Model
 ```typescript
@@ -200,7 +200,7 @@ price: Decimal     // Sale amount
 - **Protected routes for owners/admins**
 - **Secure password hashing with bcrypt**
 
-## 📝 Environment Variables
+##  Environment Variables
 
 | Variable | Description | Default |
 |----------|-------------|---------|
@@ -240,7 +240,7 @@ CREATE INDEX idx_bookings_dates ON bookings(startDate, endDate);
 5. Enable rate limiting
 6. Set up monitoring and logging
 
-## 🎯 Features
+##  Features
 
 ### User Features
 - **User Registration & Authentication**: Secure JWT-based auth
